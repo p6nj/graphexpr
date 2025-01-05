@@ -1,7 +1,7 @@
 # eframe template
 
-[![dependency status](https://deps.rs/repo/github/emilk/eframe_template/status.svg)](https://deps.rs/repo/github/emilk/eframe_template)
-[![Build Status](https://github.com/emilk/eframe_template/workflows/CI/badge.svg)](https://github.com/emilk/eframe_template/actions?workflow=CI)
+[![dependency status](https://deps.rs/repo/github/p6nj/graphexpr/status.svg)](https://deps.rs/repo/github/p6nj/graphexpr)
+[![Build Status](https://github.com/p6nj/graphexpr/workflows/CI/badge.svg)](https://github.com/p6nj/graphexpr/actions?workflow=CI)
 
 This is a template repo for [eframe](https://github.com/emilk/egui/tree/master/crates/eframe), a framework for writing apps using [egui](https://github.com/emilk/egui/).
 
@@ -11,19 +11,19 @@ You can compile your app natively or for the web, and share it using Github Page
 
 ## Getting started
 
-Start by clicking "Use this template" at https://github.com/emilk/eframe_template/ or follow [these instructions](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template).
+Start by clicking "Use this template" at https://github.com/p6nj/graphexpr/ or follow [these instructions](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template).
 
 Change the name of the crate: Choose a good name for your project, and change the name to it in:
 * `Cargo.toml`
-    * Change the `package.name` from `eframe_template` to `your_crate`.
+    * Change the `package.name` from `graphexpr` to `your_crate`.
     * Change the `package.authors`
 * `main.rs`
-    * Change `eframe_template::TemplateApp` to `your_crate::TemplateApp`
+    * Change `graphexpr::TemplateApp` to `your_crate::TemplateApp`
 * `index.html`
     * Change the `<title>eframe template</title>` to `<title>your_crate</title>`. optional.
 * `assets/sw.js`
-  * Change the `'./eframe_template.js'` to `./your_crate.js` (in `filesToCache` array)
-  * Change the `'./eframe_template_bg.wasm'` to `./your_crate_bg.wasm` (in `filesToCache` array)
+  * Change the `'./graphexpr.js'` to `./your_crate.js` (in `filesToCache` array)
+  * Change the `'./graphexpr_bg.wasm'` to `./your_crate_bg.wasm` (in `filesToCache` array)
 
 Alternatively, you can run `fill_template.sh` which will ask for the needed names and email and perform the above patches for you. This is particularly useful if you clone this repository outside GitHub and hence cannot make use of its
 templating function.
@@ -32,7 +32,7 @@ templating function.
 
 `src/app.rs` contains a simple example app. This is just to give some inspiration - most of it can be removed if you like.
 
-The official egui docs are at <https://docs.rs/egui>. If you prefer watching a video introduction, check out <https://www.youtube.com/watch?v=NtUkr_z7l84>. For inspiration, check out the [the egui web demo](https://emilk.github.io/egui/index.html) and follow the links in it to its source code.
+The official egui docs are at <https://docs.rs/egui>. If you prefer watching a video introduction, check out <https://www.youtube.com/watch?v=NtUkr_z7l84>. For inspiration, check out the [the egui web demo](https://p6nj.github.io/egui/index.html) and follow the links in it to its source code.
 
 ### Testing locally
 
@@ -78,10 +78,10 @@ We use [Trunk](https://trunkrs.dev/) to build for web target.
 >       - <branch name>
 > ```
 
-You can test the template app at <https://emilk.github.io/eframe_template/>.
+You can test the template app at <https://p6nj.github.io/graphexpr/>.
 
 ## Updating egui
 
-As of 2023, egui is in active development with frequent releases with breaking changes. [eframe_template](https://github.com/emilk/eframe_template/) will be updated in lock-step to always use the latest version of egui.
+As of 2023, egui is in active development with frequent releases with breaking changes. [graphexpr](https://github.com/p6nj/graphexpr/) will be updated in lock-step to always use the latest version of egui.
 
 When updating `egui` and `eframe` it is recommended you do so one version at the time, and read about the changes in [the egui changelog](https://github.com/emilk/egui/blob/master/CHANGELOG.md) and [eframe changelog](https://github.com/emilk/egui/blob/master/crates/eframe/CHANGELOG.md).
