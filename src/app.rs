@@ -1,22 +1,17 @@
+#[cfg(not(target_arch = "wasm32"))]
+use std::path::PathBuf;
+
+use egui::ImageSource;
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(Default, serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct GraphExpr {
-    // Example stuff:
-    label: String,
-
-    #[serde(skip)] // This how you opt-out of serialization of a field
-    value: f32,
-}
-
-impl Default for GraphExpr {
-    fn default() -> Self {
-        Self {
-            // Example stuff:
-            label: "Hello World!".to_owned(),
-            value: 2.7,
-        }
-    }
+    expr: String,
+    #[serde(skip)]
+    svg: Option<Vec<u8>>,
+    #[cfg(not(target_arch = "wasm32"))]
+    last_save_path: Option<PathBuf>,
 }
 
 impl GraphExpr {
@@ -54,23 +49,49 @@ impl eframe::App for GraphExpr {
             egui::menu::bar(ui, |ui| {
                 // NOTE: no File->Quit on web pages!
                 let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    ui.menu_button("File", |ui| {
+                ui.menu_button("File", |ui| {
+                    if !is_web {
                         if ui.button("Quit").clicked() {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
-                    });
+                    }
                     ui.add_space(16.0);
-                }
+                });
 
                 egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.add(egui::Image::new(egui::include_image!(
-                "../Black Gentoo Thing v1.0.svg"
-            )));
+            if let Some(ref svg) = self.svg {
+                ui.add(egui::Image::new(ImageSource::from((
+                    "bytes://graph.svg",
+                    svg.clone(),
+                ))));
+            } else {
+                self.svg = Some({
+                    let data = svg::node::element::path::Data::new()
+                        .move_to((10, 10))
+                        .line_by((0, 50))
+                        .line_by((50, 0))
+                        .line_by((0, -50))
+                        .close();
+
+                    let path = svg::node::element::Path::new()
+                        .set("fill", "none")
+                        .set("stroke", "black")
+                        .set("stroke-width", 3)
+                        .set("d", data);
+
+                    let document = svg::Document::new()
+                        .set("viewBox", (0, 0, 70, 70))
+                        .add(path);
+
+                    let mut result = Vec::new();
+                    svg::write(&mut result, &document).unwrap();
+                    result
+                })
+            }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 powered_by_egui_and_eframe(ui);
