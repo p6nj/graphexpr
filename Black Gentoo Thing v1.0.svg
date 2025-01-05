@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="399.28574" height="83.420921" id="svg2" version="1.1" inkscape:version="0.48.1 r9760" sodipodi:docname="black-gentoo-thing.svg">
+  <title id="title3047">Black Gentoo Thing v1.0.1</title>
+  <defs id="defs4">
+    <linearGradient id="linearGradientFadeOutWhite">
+      <stop style="stop-color:#ffffff;stop-opacity:0.69064748;" offset="0" id="stop5614"/>
+      <stop id="stop5618" offset="0.247788" style="stop-color:#ffffff;stop-opacity:0.40287769;"/>
+      <stop style="stop-color:#ffffff;stop-opacity:0.22302158;" offset="0.45268026" id="stop5620"/>
+      <stop id="stop5622" offset="0.64661229" style="stop-color:#ffffff;stop-opacity:0.07913669;"/>
+      <stop style="stop-color:#ffffff;stop-opacity:0;" offset="1" id="stop5616"/>
+    </linearGradient>
+    <linearGradient inkscape:collect="always" xlink:href="#linearGradientFadeOutWhite" id="linearGradientPitWall" x1="311.78571" y1="631.64789" x2="304.99997" y2="709.50507" gradientUnits="userSpaceOnUse"/>
+  </defs>
+  <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:zoom="1.979899" inkscape:cx="124.38271" inkscape:cy="41.79217" inkscape:document-units="px" inkscape:current-layer="layer1" showgrid="false" inkscape:window-width="1280" inkscape:window-height="968" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"/>
+  <metadata id="metadata7">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <dc:title>Black Gentoo Thing v1.0.1</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Sebastian Pipping &lt;sping@gentoo.org&gt;</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:source>gentoo-2.gif</dc:source>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Gentoo Linux mascot SVG</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>Gentoo Foundation, Inc.</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:date>2011-04-27</dc:date>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/2.5/"/>
+        <dc:relation>SVG remake from raster image</dc:relation>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Gentoo Foundation, Inc.</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/by-sa/2.5/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Notice"/>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+        <cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1" transform="translate(-102.5,-656.36602)">
+    <g id="g3020" transform="translate(5.3571623,3.4349199)" inkscape:label="black gentoo thing">
+      <path inkscape:label="outer ring" sodipodi:type="arc" style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" id="path5447" sodipodi:cx="306.78571" sodipodi:cy="666.64789" sodipodi:rx="199.64287" sodipodi:ry="30.418419" d="m 506.42857,666.64789 c 0,16.79963 -89.38315,30.41842 -199.64286,30.41842 -110.25972,0 -199.64287,-13.61879 -199.64287,-30.41842 0,-16.79963 89.38315,-30.41842 199.64287,-30.41842 110.25971,0 199.64286,13.61879 199.64286,30.41842 z" transform="translate(-9.9999994,39.285714)"/>
+      <path inkscape:label="inner ring bottom black" sodipodi:type="arc" style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" id="path5449" sodipodi:cx="306.78571" sodipodi:cy="666.64789" sodipodi:rx="168.92859" sodipodi:ry="22.142857" d="m 475.71429,666.64789 c 0,12.22916 -75.6319,22.14285 -168.92858,22.14285 -93.29669,0 -168.92859,-9.91369 -168.92859,-22.14285 0,-12.22916 75.6319,-22.14286 168.92859,-22.14286 93.29668,0 168.92858,9.9137 168.92858,22.14286 z" transform="translate(-1.0714192,35.714298)"/>
+      <path transform="translate(-1.0714192,35.714298)" d="m 475.71429,666.64789 c 0,12.22916 -75.6319,22.14285 -168.92858,22.14285 -93.29669,0 -168.92859,-9.91369 -168.92859,-22.14285 0,-12.22916 75.6319,-22.14286 168.92859,-22.14286 93.29668,0 168.92858,9.9137 168.92858,22.14286 z" sodipodi:ry="22.142857" sodipodi:rx="168.92859" sodipodi:cy="666.64789" sodipodi:cx="306.78571" id="path5471" style="color:#000000;fill:url(#linearGradientPitWall);fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" sodipodi:type="arc" inkscape:label="inner ring top gradient"/>
+      <path style="fill:#000000;fill-opacity:0.15416667;stroke:none" d="m 311.60715,678.1325 c 1.97354,-4.60331 1.69774,-8.08557 2.6136,-13.61141 2.2008,-5.40127 5.55881,-9.53676 9.51245,-8.57963 3.37457,4.40415 -3.59079,9.71514 -4.10085,10.35982" id="path5467" inkscape:connector-curvature="0" sodipodi:nodetypes="cccc" inkscape:label="shock right"/>
+      <path inkscape:label="body" style="fill:#000000;fill-opacity:1;stroke:none" d="m 358.57143,734.50503 c -10.75979,-18.96202 -10.16898,-46.22838 -28.05775,-61.07325 -11.24984,-9.44963 -20.3566,15.12568 -28.97357,-1.96986 -12.31071,-14.1114 -25.88264,6.31426 -30.29722,17.36706 -5.75506,13.57292 -9.23322,30.92788 -10.35,45.49749" id="path5453" inkscape:connector-curvature="0" sodipodi:nodetypes="ccccc"/>
+      <path sodipodi:type="arc" style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" id="path5457" sodipodi:cx="277.14285" sodipodi:cy="803.07648" sodipodi:rx="15.209209" sodipodi:ry="15.209209" d="m 292.35206,803.07648 c 0,8.39981 -6.80939,15.20921 -15.20921,15.20921 -8.39981,0 -15.20921,-6.8094 -15.20921,-15.20921 0,-8.39982 6.8094,-15.20921 15.20921,-15.20921 8.39982,0 15.20921,6.80939 15.20921,15.20921 z" transform="translate(18.510154,-102.56128)" inkscape:label="eye left white"/>
+      <path style="fill:#000000;fill-opacity:0.15416667;stroke:none" d="m 301.93365,673.7332 c -3.18768,-5.21074 -4.47612,-8.01255 -7.29179,-11.81115 -1.41287,-3.83967 -5.02764,-9.49522 0.57813,-8.95492 5.05758,2.09373 5.28171,6.53467 6.21361,10.7121 0.0683,2.29709 0.61952,6.73532 0.50005,10.05397 z" id="path5469" inkscape:connector-curvature="0" sodipodi:nodetypes="ccccc" inkscape:label="shock left"/>
+      <path inkscape:label="eye left black" transform="translate(-5.5050763,-73.214286)" d="m 308.27556,763.61218 c 0,2.4994 -2.02616,4.52556 -4.52556,4.52556 -2.4994,0 -4.52556,-2.02616 -4.52556,-4.52556 0,-2.4994 2.02616,-4.52556 4.52556,-4.52556 2.4994,0 4.52556,2.02616 4.52556,4.52556 z" sodipodi:ry="4.5255618" sodipodi:rx="4.5255618" sodipodi:cy="763.61218" sodipodi:cx="303.75" id="path5463" style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" sodipodi:type="arc"/>
+      <path sodipodi:type="arc" style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" id="path5457-6" sodipodi:cx="277.14285" sodipodi:cy="803.07648" sodipodi:rx="15.209209" sodipodi:ry="15.209209" d="m 292.35206,803.07648 c 0,8.39981 -6.80939,15.20921 -15.20921,15.20921 -8.39981,0 -15.20921,-6.8094 -15.20921,-15.20921 0,-8.39982 6.8094,-15.20921 15.20921,-15.20921 8.39982,0 15.20921,6.80939 15.20921,15.20921 z" transform="translate(42.857147,-101.07143)" inkscape:label="eye left white"/>
+      <path inkscape:label="eye left black" transform="translate(14.464286,-71.250001)" d="m 308.27556,763.61218 c 0,2.4994 -2.02616,4.52556 -4.52556,4.52556 -2.4994,0 -4.52556,-2.02616 -4.52556,-4.52556 0,-2.4994 2.02616,-4.52556 4.52556,-4.52556 2.4994,0 4.52556,2.02616 4.52556,4.52556 z" sodipodi:ry="4.5255618" sodipodi:rx="4.5255618" sodipodi:cy="763.61218" sodipodi:cx="303.75" id="path5463-4" style="color:#000000;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" sodipodi:type="arc"/>
+    </g>
+  </g>
+</svg>
