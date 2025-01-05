@@ -9,7 +9,7 @@ use egui::ImageSource;
 pub struct GraphExpr {
     expr: String,
     #[serde(skip)]
-    svg: Option<Vec<u8>>,
+    svg: Vec<u8>,
     #[cfg(not(target_arch = "wasm32"))]
     last_save_path: Option<PathBuf>,
 }
@@ -27,6 +27,41 @@ impl GraphExpr {
         }
 
         Default::default()
+    }
+    fn write_svg(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
+        let data = svg::node::element::path::Data::new()
+            .move_to((10, 10))
+            .line_by((0, 50))
+            .line_by((50, 0))
+            .line_by((0, -50))
+            .close();
+
+        let path = svg::node::element::Path::new()
+            .set("fill", "none")
+            .set(
+                "stroke",
+                match ctx.theme() {
+                    egui::Theme::Dark => "white",
+                    egui::Theme::Light => "black",
+                },
+            )
+            .set("stroke-width", 3)
+            .set("d", data);
+
+        let document = svg::Document::new()
+            .set("viewBox", (0, 0, 70, 70))
+            .add(path);
+
+        println!("{}", document);
+        self.svg.clear();
+        svg::write(&mut self.svg, &document).unwrap();
+        ui.add(egui::Image::new(ImageSource::from((
+            match ctx.theme() {
+                egui::Theme::Dark => "bytes://graph-dark.svg",
+                egui::Theme::Light => "bytes://graph.svg",
+            },
+            self.svg.clone(),
+        ))));
     }
 }
 
@@ -63,35 +98,7 @@ impl eframe::App for GraphExpr {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            if let Some(ref svg) = self.svg {
-                ui.add(egui::Image::new(ImageSource::from((
-                    "bytes://graph.svg",
-                    svg.clone(),
-                ))));
-            } else {
-                self.svg = Some({
-                    let data = svg::node::element::path::Data::new()
-                        .move_to((10, 10))
-                        .line_by((0, 50))
-                        .line_by((50, 0))
-                        .line_by((0, -50))
-                        .close();
-
-                    let path = svg::node::element::Path::new()
-                        .set("fill", "none")
-                        .set("stroke", "black")
-                        .set("stroke-width", 3)
-                        .set("d", data);
-
-                    let document = svg::Document::new()
-                        .set("viewBox", (0, 0, 70, 70))
-                        .add(path);
-
-                    let mut result = Vec::new();
-                    svg::write(&mut result, &document).unwrap();
-                    result
-                })
-            }
+            self.write_svg(ui, ctx);
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 powered_by_egui_and_eframe(ui);
