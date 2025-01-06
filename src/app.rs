@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen(
-    inline_js = "export function download(bytes) { window.location.replace(URL.createObjectURL(new Blob([bytes], { type: 'image/svg' }))); }"
+    inline_js = "export function download(bytes) { window.open(URL.createObjectURL(new Blob([bytes], { type: 'image/svg' })), '_blank').focus(); }"
 )]
 extern "C" {
     fn download(bytes: Vec<u8>) -> u32;
