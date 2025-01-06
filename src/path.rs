@@ -22,7 +22,7 @@ fn link(data: path::Data, a: Point, b: Point) -> path::Data {
 
 fn get_coordinates(point: u32, total: u32) -> Point {
     (
-        1000f32 * ((2f64 * PI * (point as f64)) / total as f64).sin() as f32 + 500f32,
-        1000f32 * ((2f64 * PI * (point as f64)) / total as f64).cos() as f32 + 500f32,
+        500f32 * ((2f64 * PI * (point as f64)) / total as f64).sin() as f32 + 500f32,
+        500f32 * ((2f64 * PI * (point as f64)) / total as f64).cos() as f32 + 500f32,
     )
 }
