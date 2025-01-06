@@ -143,16 +143,19 @@ impl<'a> eframe::App for GraphExpr<'a> {
                 download(
                     svg::Document::new()
                         .set("viewBox", (0, 0, 1000, 1000))
+                        .set(
+                            "style",
+                            format!(
+                                "background-color: {}",
+                                match ctx.theme() {
+                                    egui::Theme::Dark => "black",
+                                    egui::Theme::Light => "white",
+                                }
+                            ),
+                        )
                         .add(
                             self.svg_path
                                 .clone()
-                                .set(
-                                    "background-color",
-                                    match ctx.theme() {
-                                        egui::Theme::Dark => "black",
-                                        egui::Theme::Light => "white",
-                                    },
-                                )
                                 .set("stroke-width", self.stroke)
                                 .set("d", super::path::sample(self.points)),
                         )
