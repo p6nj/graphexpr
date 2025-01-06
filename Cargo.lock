@@ -1498,6 +1498,7 @@ dependencies = [
  "log",
  "serde",
  "svg",
+ "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
 ]

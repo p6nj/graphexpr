@@ -3,6 +3,16 @@ use std::path::PathBuf;
 
 use egui::ImageSource;
 use egui_dialogs::Dialogs;
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::prelude::wasm_bindgen;
+
+#[cfg(target_arch = "wasm32")]
+#[wasm_bindgen(
+    inline_js = "export function download(bytes) { window.location.replace(URL.createObjectURL(new Blob([bytes], { type: 'image/svg' }))); }"
+)]
+extern "C" {
+    fn download(bytes: Vec<u8>) -> u32;
+}
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -129,18 +139,25 @@ impl<'a> eframe::App for GraphExpr<'a> {
                 self.reload_image = true;
             }
             if ui.button("Save").clicked() {
-                svg::Document::new().set("viewBox", (0, 0, 1000, 1000)).add(
-                    self.svg_path
-                        .clone()
-                        .set(
-                            "background-color",
-                            match ctx.theme() {
-                                egui::Theme::Dark => "black",
-                                egui::Theme::Light => "white",
-                            },
+                #[cfg(target_arch = "wasm32")]
+                download(
+                    svg::Document::new()
+                        .set("viewBox", (0, 0, 1000, 1000))
+                        .add(
+                            self.svg_path
+                                .clone()
+                                .set(
+                                    "background-color",
+                                    match ctx.theme() {
+                                        egui::Theme::Dark => "black",
+                                        egui::Theme::Light => "white",
+                                    },
+                                )
+                                .set("stroke-width", self.stroke)
+                                .set("d", super::path::sample(self.points)),
                         )
-                        .set("stroke-width", self.stroke)
-                        .set("d", super::path::sample(self.points)),
+                        .to_string()
+                        .into_bytes(),
                 );
             }
             if self.reload_image {
