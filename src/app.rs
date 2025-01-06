@@ -121,9 +121,9 @@ impl<'a> eframe::App for GraphExpr<'a> {
                     .svg_path
                     .clone()
                     .set("stroke-width", self.stroke)
-                    .set("d", super::path::sample());
+                    .set("d", super::path::sample(self.points));
                 self.funny_bool = !self.funny_bool;
-                self.dialogs.info("OK", "It's ok!!!");
+                // self.dialogs.info("OK", "It's ok!!!");
             }
             ui.add(egui::Image::new(ImageSource::from((
                 match (ctx.theme(), self.funny_bool) {
