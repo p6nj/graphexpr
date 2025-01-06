@@ -26,6 +26,7 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 svg = "0.18"
 egui_dialogs = { git = "https://github.com/p6nj/egui_dialogs", branch = "master" }
+fasteval = "0.2.4"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

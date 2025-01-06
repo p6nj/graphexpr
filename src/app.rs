@@ -43,8 +43,8 @@ impl<'a> Default for GraphExpr<'a> {
                 .set("stroke", "black")
                 .set("fill", "none")
                 .set("stroke-width", 3),
-            expr: "true".to_string(),
-            points: 50,
+            expr: "a % b == 0".to_string(),
+            points: 150,
             stroke: 3f32,
             #[cfg(not(target_arch = "wasm32"))]
             last_save_path: None,
@@ -132,42 +132,61 @@ impl<'a> eframe::App for GraphExpr<'a> {
                 );
             });
             if ui.button("Preview").clicked() {
-                self.svg_path = self
-                    .svg_path
-                    .clone()
-                    .set("stroke-width", self.stroke)
-                    .set("d", super::path::sample(self.points));
-                // self.dialogs.info("OK", "It's ok!!!");
-                self.reload_image = true;
-            }
-            if ui.button("Save").clicked() {
-                let document = svg::Document::new()
-                    .set("viewBox", (0, 0, 1000, 1000))
-                    .set(
-                        "style",
-                        match ctx.theme() {
-                            egui::Theme::Dark => "background-color: black",
-                            egui::Theme::Light => "background-color: white",
-                        },
-                    )
-                    .add(
-                        self.svg_path
+                match super::path::graph(&self.expr, self.points) {
+                    Ok(path_data) => {
+                        self.svg_path = self
+                            .svg_path
                             .clone()
                             .set("stroke-width", self.stroke)
-                            .set("d", super::path::sample(self.points)),
-                    );
-                #[cfg(target_arch = "wasm32")]
-                download(document.to_string().into_bytes());
-                #[cfg(not(target_arch = "wasm32"))]
-                if let Some(path) = FileDialog::new().set_file_name("graph.svg").save_file() {
-                    if let Err(e) = svg::save(path.clone(), &document) {
-                        self.dialogs.error(
-                            "I/O Error :(",
-                            format!("Here's what your computer has to say about it: {:?}", e),
-                        );
+                            .set("d", path_data);
+                        self.reload_image = true;
                     }
-                    self.last_save_path = Some(path);
-                }
+                    Err(e) => self.dialogs.error(
+                        "Parsing error :O",
+                        format!("Your expression doesn't look right: {e}"),
+                    ),
+                };
+            }
+            if ui.button("Save").clicked() {
+                match super::path::graph(&self.expr, self.points) {
+                    Ok(path_data) => {
+                        let document = svg::Document::new()
+                            .set("viewBox", (0, 0, 1000, 1000))
+                            .set(
+                                "style",
+                                match ctx.theme() {
+                                    egui::Theme::Dark => "background-color: black",
+                                    egui::Theme::Light => "background-color: white",
+                                },
+                            )
+                            .add(
+                                self.svg_path
+                                    .clone()
+                                    .set("stroke-width", self.stroke)
+                                    .set("d", path_data),
+                            );
+                        #[cfg(target_arch = "wasm32")]
+                        download(document.to_string().into_bytes());
+                        #[cfg(not(target_arch = "wasm32"))]
+                        if let Some(path) = FileDialog::new().set_file_name("graph.svg").save_file()
+                        {
+                            if let Err(e) = svg::save(path.clone(), &document) {
+                                self.dialogs.error(
+                                    "I/O Error :(",
+                                    format!(
+                                        "Here's what your computer has to say about it: {:?}",
+                                        e
+                                    ),
+                                );
+                            }
+                            self.last_save_path = Some(path);
+                        }
+                    }
+                    Err(e) => self.dialogs.error(
+                        "Parsing error :O",
+                        format!("Your expression doesn't look right: {e}"),
+                    ),
+                };
             }
             if self.reload_image {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
