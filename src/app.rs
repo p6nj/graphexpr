@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use egui::ImageSource;
 use egui_dialogs::Dialogs;
+use rfd::FileDialog;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -139,29 +140,33 @@ impl<'a> eframe::App for GraphExpr<'a> {
                 self.reload_image = true;
             }
             if ui.button("Save").clicked() {
+                let document = svg::Document::new()
+                    .set("viewBox", (0, 0, 1000, 1000))
+                    .set(
+                        "style",
+                        match ctx.theme() {
+                            egui::Theme::Dark => "background-color: black",
+                            egui::Theme::Light => "background-color: white",
+                        },
+                    )
+                    .add(
+                        self.svg_path
+                            .clone()
+                            .set("stroke-width", self.stroke)
+                            .set("d", super::path::sample(self.points)),
+                    );
                 #[cfg(target_arch = "wasm32")]
-                download(
-                    svg::Document::new()
-                        .set("viewBox", (0, 0, 1000, 1000))
-                        .set(
-                            "style",
-                            format!(
-                                "background-color: {}",
-                                match ctx.theme() {
-                                    egui::Theme::Dark => "black",
-                                    egui::Theme::Light => "white",
-                                }
-                            ),
-                        )
-                        .add(
-                            self.svg_path
-                                .clone()
-                                .set("stroke-width", self.stroke)
-                                .set("d", super::path::sample(self.points)),
-                        )
-                        .to_string()
-                        .into_bytes(),
-                );
+                download(document.to_string().into_bytes());
+                #[cfg(not(target_arch = "wasm32"))]
+                if let Some(path) = FileDialog::new().set_file_name("graph.svg").save_file() {
+                    if let Err(e) = svg::save(path.clone(), &document) {
+                        self.dialogs.error(
+                            "I/O Error :(",
+                            format!("Here's what your computer has to say about it: {:?}", e),
+                        );
+                    }
+                    self.last_save_path = Some(path);
+                }
             }
             if self.reload_image {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
