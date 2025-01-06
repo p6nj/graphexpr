@@ -2,12 +2,17 @@
 use std::path::PathBuf;
 
 use egui::ImageSource;
+use egui_dialogs::Dialogs;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct GraphExpr {
+pub struct GraphExpr<'a> {
+    #[serde(skip)]
+    dialogs: Dialogs<'a>,
     expr: String,
+    points: u32,
+    stroke: f32,
     #[serde(skip)]
     svg_path: svg::node::element::Path,
     #[cfg(not(target_arch = "wasm32"))]
@@ -16,21 +21,24 @@ pub struct GraphExpr {
     funny_bool: bool,
 }
 
-impl Default for GraphExpr {
+impl<'a> Default for GraphExpr<'a> {
     fn default() -> Self {
         GraphExpr {
+            dialogs: Default::default(),
             svg_path: svg::node::element::Path::new()
                 .set("fill", "none")
                 .set("stroke-width", 3),
-            expr: Default::default(),
+            expr: "true".to_string(),
+            points: 50,
+            stroke: 3f32,
             #[cfg(not(target_arch = "wasm32"))]
-            last_save_path: Default::default(),
+            last_save_path: None,
             funny_bool: Default::default(),
         }
     }
 }
 
-impl GraphExpr {
+impl<'a> GraphExpr<'a> {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
@@ -53,7 +61,7 @@ fn theme_to_stroke_color(theme: egui::Theme) -> &'static str {
     }
 }
 
-impl eframe::App for GraphExpr {
+impl<'a> eframe::App for GraphExpr<'a> {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
@@ -65,6 +73,7 @@ impl eframe::App for GraphExpr {
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
         egui_extras::install_image_loaders(ctx);
+        self.dialogs.show(ctx);
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -86,22 +95,36 @@ impl eframe::App for GraphExpr {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.label("Expression: ");
-                ui.text_edit_singleline(&mut self.expr);
-                if ui.button("Go!").clicked() {
-                    self.svg_path = self.svg_path.clone().set(
-                        "d",
-                        svg::node::element::path::Data::new()
-                            .move_to((10, 10))
-                            .line_by((0, 50))
-                            .line_by((50, 0))
-                            .line_by((0, -50))
-                            .close(),
-                    );
-
-                    self.funny_bool = !self.funny_bool;
-                }
+                let label = ui.label("Expression: ");
+                ui.text_edit_singleline(&mut self.expr)
+                    .labelled_by(label.id);
             });
+            ui.horizontal(|ui| {
+                ui.label("Number of points: ");
+                ui.add(
+                    egui::DragValue::new(&mut self.points)
+                        .speed(1f32)
+                        .range(1f32..=f32::MAX)
+                        .fixed_decimals(0),
+                );
+            });
+            ui.horizontal(|ui| {
+                ui.label("Stroke width: ");
+                ui.add(
+                    egui::DragValue::new(&mut self.stroke)
+                        .speed(0.001)
+                        .range(0f32..=20f32),
+                );
+            });
+            if ui.button("Go!").clicked() {
+                self.svg_path = self
+                    .svg_path
+                    .clone()
+                    .set("stroke-width", self.stroke)
+                    .set("d", super::path::sample());
+                self.funny_bool = !self.funny_bool;
+                self.dialogs.info("OK", "It's ok!!!");
+            }
             ui.add(egui::Image::new(ImageSource::from((
                 match (ctx.theme(), self.funny_bool) {
                     (egui::Theme::Dark, false) => "bytes://graph-dark.svg",
@@ -109,15 +132,15 @@ impl eframe::App for GraphExpr {
                     (egui::Theme::Dark, true) => "bytes://plot-dark.svg",
                     (egui::Theme::Light, true) => "bytes://plot.svg",
                 },
-                {
-                    let d = svg::Document::new().set("viewBox", (0, 0, 70, 70)).add(
+                svg::Document::new()
+                    .set("viewBox", (0, 0, 1000, 1000))
+                    .add(
                         self.svg_path
                             .clone()
                             .set("stroke", theme_to_stroke_color(ctx.theme())),
-                    );
-                    println!("{}", d);
-                    d.to_string().into_bytes()
-                },
+                    )
+                    .to_string()
+                    .into_bytes(),
             ))));
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {

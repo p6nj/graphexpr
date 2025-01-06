@@ -2,3 +2,4 @@
 
 mod app;
 pub use app::GraphExpr;
+pub mod path;
