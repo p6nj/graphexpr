@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use egui::ImageSource;
 use egui_dialogs::Dialogs;
+#[cfg(not(target_arch = "wasm32"))]
 use rfd::FileDialog;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
