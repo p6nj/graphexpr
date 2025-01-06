@@ -1,3 +1,4 @@
+use core::f32;
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::PathBuf;
 
@@ -109,85 +110,100 @@ impl<'a> eframe::App for GraphExpr<'a> {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                let label = ui.label("Expression: ");
-                ui.text_edit_singleline(&mut self.expr)
-                    .labelled_by(label.id);
+            ui.heading("GraphExpr");
+            ui.collapsing("What is this?", |ui| {
+                ui.label("Hello");
             });
             ui.horizontal(|ui| {
-                ui.label("Number of points: ");
+                let label = ui.label("Expression: ").id;
                 ui.add(
-                    egui::DragValue::new(&mut self.points)
-                        .speed(1f32)
-                        .range(1f32..=f32::MAX)
-                        .fixed_decimals(0),
-                );
+                    egui::TextEdit::multiline(&mut self.expr)
+                        .code_editor()
+                        .desired_rows(1)
+                        .desired_width(f32::INFINITY),
+                )
+                .labelled_by(label);
             });
+            ui.collapsing("Options", |ui| {
+                ui.horizontal(|ui| {
+                    ui.add(
+                        egui::DragValue::new(&mut self.points)
+                            .speed(1f32)
+                            .range(1f32..=f32::MAX)
+                            .fixed_decimals(0),
+                    )
+                    .labelled_by(ui.label("Number of points").id);
+                });
+                ui.horizontal(|ui| {
+                    ui.add(
+                        egui::DragValue::new(&mut self.stroke)
+                            .speed(0.001)
+                            .range(0f32..=20f32),
+                    )
+                    .labelled_by(ui.label("Stroke width").id);
+                });
+            });
+
             ui.horizontal(|ui| {
-                ui.label("Stroke width: ");
-                ui.add(
-                    egui::DragValue::new(&mut self.stroke)
-                        .speed(0.001)
-                        .range(0f32..=20f32),
-                );
-            });
-            if ui.button("Preview").clicked() {
-                match super::path::graph(&self.expr, self.points) {
-                    Ok(path_data) => {
-                        self.svg_path = self
-                            .svg_path
-                            .clone()
-                            .set("stroke-width", self.stroke)
-                            .set("d", path_data);
-                        self.reload_image = true;
-                    }
-                    Err(e) => self.dialogs.error(
-                        "Parsing error :O",
-                        format!("Your expression doesn't look right: {e}"),
-                    ),
-                };
-            }
-            if ui.button("Save").clicked() {
-                match super::path::graph(&self.expr, self.points) {
-                    Ok(path_data) => {
-                        let document = svg::Document::new()
-                            .set("viewBox", (0, 0, 1000, 1000))
-                            .set(
-                                "style",
-                                match ctx.theme() {
-                                    egui::Theme::Dark => "background-color: black",
-                                    egui::Theme::Light => "background-color: white",
-                                },
-                            )
-                            .add(
-                                self.svg_path
-                                    .clone()
-                                    .set("stroke-width", self.stroke)
-                                    .set("d", path_data),
-                            );
-                        #[cfg(target_arch = "wasm32")]
-                        download(document.to_string().into_bytes());
-                        #[cfg(not(target_arch = "wasm32"))]
-                        if let Some(path) = FileDialog::new().set_file_name("graph.svg").save_file()
-                        {
-                            if let Err(e) = svg::save(path.clone(), &document) {
-                                self.dialogs.error(
-                                    "I/O Error :(",
-                                    format!(
-                                        "Here's what your computer has to say about it: {:?}",
-                                        e
-                                    ),
-                                );
-                            }
-                            self.last_save_path = Some(path);
+                if ui.button("Preview").clicked() {
+                    match super::path::graph(&self.expr, self.points) {
+                        Ok(path_data) => {
+                            self.svg_path = self
+                                .svg_path
+                                .clone()
+                                .set("stroke-width", self.stroke)
+                                .set("d", path_data);
+                            self.reload_image = true;
                         }
-                    }
-                    Err(e) => self.dialogs.error(
-                        "Parsing error :O",
-                        format!("Your expression doesn't look right: {e}"),
-                    ),
-                };
-            }
+                        Err(e) => self.dialogs.error(
+                            "Parsing error :O",
+                            format!("Your expression doesn't look right: {e}"),
+                        ),
+                    };
+                }
+                if ui.button("Save").clicked() {
+                    match super::path::graph(&self.expr, self.points) {
+                        Ok(path_data) => {
+                            let document = svg::Document::new()
+                                .set("viewBox", (0, 0, 1000, 1000))
+                                .set(
+                                    "style",
+                                    match ctx.theme() {
+                                        egui::Theme::Dark => "background-color: black",
+                                        egui::Theme::Light => "background-color: white",
+                                    },
+                                )
+                                .add(
+                                    self.svg_path
+                                        .clone()
+                                        .set("stroke-width", self.stroke)
+                                        .set("d", path_data),
+                                );
+                            #[cfg(target_arch = "wasm32")]
+                            download(document.to_string().into_bytes());
+                            #[cfg(not(target_arch = "wasm32"))]
+                            if let Some(path) =
+                                FileDialog::new().set_file_name("graph.svg").save_file()
+                            {
+                                if let Err(e) = svg::save(path.clone(), &document) {
+                                    self.dialogs.error(
+                                        "I/O Error :(",
+                                        format!(
+                                            "Here's what your computer has to say about it: {:?}",
+                                            e
+                                        ),
+                                    );
+                                }
+                                self.last_save_path = Some(path);
+                            }
+                        }
+                        Err(e) => self.dialogs.error(
+                            "Parsing error :O",
+                            format!("Your expression doesn't look right: {e}"),
+                        ),
+                    };
+                }
+            });
             if self.reload_image {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
                 self.reload_image = !self.reload_image;
