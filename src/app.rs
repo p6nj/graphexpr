@@ -18,7 +18,9 @@ pub struct GraphExpr<'a> {
     #[cfg(not(target_arch = "wasm32"))]
     last_save_path: Option<PathBuf>,
     #[serde(skip)]
-    funny_bool: bool,
+    dumb_counter: u32,
+    #[serde(skip)]
+    reload_image: bool,
 }
 
 impl<'a> Default for GraphExpr<'a> {
@@ -26,6 +28,7 @@ impl<'a> Default for GraphExpr<'a> {
         GraphExpr {
             dialogs: Default::default(),
             svg_path: svg::node::element::Path::new()
+                .set("stroke", "black")
                 .set("fill", "none")
                 .set("stroke-width", 3),
             expr: "true".to_string(),
@@ -33,7 +36,8 @@ impl<'a> Default for GraphExpr<'a> {
             stroke: 3f32,
             #[cfg(not(target_arch = "wasm32"))]
             last_save_path: None,
-            funny_bool: Default::default(),
+            dumb_counter: 0,
+            reload_image: false,
         }
     }
 }
@@ -54,13 +58,6 @@ impl<'a> GraphExpr<'a> {
     }
 }
 
-fn theme_to_stroke_color(theme: egui::Theme) -> &'static str {
-    match theme {
-        egui::Theme::Dark => "white",
-        egui::Theme::Light => "black",
-    }
-}
-
 impl<'a> eframe::App for GraphExpr<'a> {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
@@ -74,6 +71,22 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
         egui_extras::install_image_loaders(ctx);
         self.dialogs.show(ctx);
+
+        if self.svg_path.get_attributes()["stroke"]
+            != match ctx.theme() {
+                egui::Theme::Dark => "white",
+                egui::Theme::Light => "black",
+            }
+        {
+            self.svg_path = self.svg_path.clone().set(
+                "stroke",
+                match ctx.theme() {
+                    egui::Theme::Dark => "white",
+                    egui::Theme::Light => "black",
+                },
+            );
+            self.reload_image = true;
+        }
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -116,29 +129,39 @@ impl<'a> eframe::App for GraphExpr<'a> {
                         .range(0f32..=20f32),
                 );
             });
-            if ui.button("Go!").clicked() {
+            if ui.button("Preview").clicked() {
                 self.svg_path = self
                     .svg_path
                     .clone()
                     .set("stroke-width", self.stroke)
                     .set("d", super::path::sample(self.points));
-                self.funny_bool = !self.funny_bool;
                 // self.dialogs.info("OK", "It's ok!!!");
+                self.reload_image = true;
+            }
+            if ui.button("Save").clicked() {
+                svg::Document::new().set("viewBox", (0, 0, 1000, 1000)).add(
+                    self.svg_path
+                        .clone()
+                        .set(
+                            "background-color",
+                            match ctx.theme() {
+                                egui::Theme::Dark => "black",
+                                egui::Theme::Light => "white",
+                            },
+                        )
+                        .set("stroke-width", self.stroke)
+                        .set("d", super::path::sample(self.points)),
+                );
+            }
+            if self.reload_image {
+                self.dumb_counter = self.dumb_counter.wrapping_add(1);
+                self.reload_image = !self.reload_image;
             }
             ui.add(egui::Image::new(ImageSource::from((
-                match (ctx.theme(), self.funny_bool) {
-                    (egui::Theme::Dark, false) => "bytes://graph-dark.svg",
-                    (egui::Theme::Light, false) => "bytes://graph.svg",
-                    (egui::Theme::Dark, true) => "bytes://plot-dark.svg",
-                    (egui::Theme::Light, true) => "bytes://plot.svg",
-                },
+                format!("bytes://graph{}.svg", self.dumb_counter),
                 svg::Document::new()
                     .set("viewBox", (0, 0, 1000, 1000))
-                    .add(
-                        self.svg_path
-                            .clone()
-                            .set("stroke", theme_to_stroke_color(ctx.theme())),
-                    )
+                    .add(self.svg_path.clone())
                     .to_string()
                     .into_bytes(),
             ))));
