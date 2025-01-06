@@ -92,16 +92,6 @@ impl<'a> eframe::App for GraphExpr<'a> {
             // The top panel is often a good place for a menu bar:
 
             egui::menu::bar(ui, |ui| {
-                // NOTE: no File->Quit on web pages!
-                let is_web = cfg!(target_arch = "wasm32");
-                ui.menu_button("File", |ui| {
-                    if !is_web {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                        ui.add_space(16.0);
-                    }
-                });
                 egui::global_theme_preference_buttons(ui);
             });
         });
