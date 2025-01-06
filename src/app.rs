@@ -4,14 +4,30 @@ use std::path::PathBuf;
 use egui::ImageSource;
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[derive(Default, serde::Deserialize, serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct GraphExpr {
     expr: String,
     #[serde(skip)]
-    svg: Vec<u8>,
+    svg_path: svg::node::element::Path,
     #[cfg(not(target_arch = "wasm32"))]
     last_save_path: Option<PathBuf>,
+    #[serde(skip)]
+    funny_bool: bool,
+}
+
+impl Default for GraphExpr {
+    fn default() -> Self {
+        GraphExpr {
+            svg_path: svg::node::element::Path::new()
+                .set("fill", "none")
+                .set("stroke-width", 3),
+            expr: Default::default(),
+            #[cfg(not(target_arch = "wasm32"))]
+            last_save_path: Default::default(),
+            funny_bool: Default::default(),
+        }
+    }
 }
 
 impl GraphExpr {
@@ -28,40 +44,12 @@ impl GraphExpr {
 
         Default::default()
     }
-    fn write_svg(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
-        let data = svg::node::element::path::Data::new()
-            .move_to((10, 10))
-            .line_by((0, 50))
-            .line_by((50, 0))
-            .line_by((0, -50))
-            .close();
+}
 
-        let path = svg::node::element::Path::new()
-            .set("fill", "none")
-            .set(
-                "stroke",
-                match ctx.theme() {
-                    egui::Theme::Dark => "white",
-                    egui::Theme::Light => "black",
-                },
-            )
-            .set("stroke-width", 3)
-            .set("d", data);
-
-        let document = svg::Document::new()
-            .set("viewBox", (0, 0, 70, 70))
-            .add(path);
-
-        println!("{}", document);
-        self.svg.clear();
-        svg::write(&mut self.svg, &document).unwrap();
-        ui.add(egui::Image::new(ImageSource::from((
-            match ctx.theme() {
-                egui::Theme::Dark => "bytes://graph-dark.svg",
-                egui::Theme::Light => "bytes://graph.svg",
-            },
-            self.svg.clone(),
-        ))));
+fn theme_to_stroke_color(theme: egui::Theme) -> &'static str {
+    match theme {
+        egui::Theme::Dark => "white",
+        egui::Theme::Light => "black",
     }
 }
 
@@ -89,16 +77,48 @@ impl eframe::App for GraphExpr {
                         if ui.button("Quit").clicked() {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
+                        ui.add_space(16.0);
                     }
-                    ui.add_space(16.0);
                 });
-
-                egui::widgets::global_theme_preference_buttons(ui);
+                egui::global_theme_preference_buttons(ui);
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            self.write_svg(ui, ctx);
+            ui.horizontal(|ui| {
+                ui.label("Expression: ");
+                ui.text_edit_singleline(&mut self.expr);
+                if ui.button("Go!").clicked() {
+                    self.svg_path = self.svg_path.clone().set(
+                        "d",
+                        svg::node::element::path::Data::new()
+                            .move_to((10, 10))
+                            .line_by((0, 50))
+                            .line_by((50, 0))
+                            .line_by((0, -50))
+                            .close(),
+                    );
+
+                    self.funny_bool = !self.funny_bool;
+                }
+            });
+            ui.add(egui::Image::new(ImageSource::from((
+                match (ctx.theme(), self.funny_bool) {
+                    (egui::Theme::Dark, false) => "bytes://graph-dark.svg",
+                    (egui::Theme::Light, false) => "bytes://graph.svg",
+                    (egui::Theme::Dark, true) => "bytes://plot-dark.svg",
+                    (egui::Theme::Light, true) => "bytes://plot.svg",
+                },
+                {
+                    let d = svg::Document::new().set("viewBox", (0, 0, 70, 70)).add(
+                        self.svg_path
+                            .clone()
+                            .set("stroke", theme_to_stroke_color(ctx.theme())),
+                    );
+                    println!("{}", d);
+                    d.to_string().into_bytes()
+                },
+            ))));
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 powered_by_egui_and_eframe(ui);
