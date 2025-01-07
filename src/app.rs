@@ -14,7 +14,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
                             window.open(URL.createObjectURL(new Blob([bytes], { type: \
                             'image/svg' })), '_blank').focus(); }")]
 extern "C" {
-    fn download(bytes: Vec<u8>) -> u32;
+    fn download(bytes: Vec<u8>);
 }
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -24,14 +24,14 @@ pub struct GraphExpr<'a> {
     #[serde(skip)]
     dialogs: Dialogs<'a>,
     expr: String,
-    points: u32,
+    points: u16,
     stroke: f32,
     #[serde(skip)]
     svg_path: svg::node::element::Path,
     #[cfg(not(target_arch = "wasm32"))]
     last_save_path: Option<PathBuf>,
     #[serde(skip)]
-    dumb_counter: u32,
+    dumb_counter: u16,
     #[serde(skip)]
     reload_image: bool,
 }

@@ -28,6 +28,7 @@ svg = "0.18"
 egui_dialogs = { git = "https://github.com/p6nj/egui_dialogs", branch = "master" }
 fasteval = "0.2"
 rayon = "1.10.0"
+itertools = "0.14.0"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
