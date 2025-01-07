@@ -232,8 +232,15 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             #[cfg(target_arch = "wasm32")]
                             download(document.to_string().into_bytes());
                             #[cfg(not(target_arch = "wasm32"))]
-                            if let Some(path) =
-                                FileDialog::new().set_file_name("graph.svg").save_file()
+                            if let Some(path) = {
+                                let dialog = FileDialog::new().set_file_name("graph.svg");
+                                if let Some(ref path) = self.last_save_path {
+                                    dialog.set_directory(path)
+                                } else {
+                                    dialog
+                                }
+                            }
+                            .save_file()
                             {
                                 if let Err(e) = svg::save(path.clone(), &document) {
                                     self.dialogs.error(
@@ -258,14 +265,21 @@ impl<'a> eframe::App for GraphExpr<'a> {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
                 self.reload_image = !self.reload_image;
             }
-            ui.add(egui::Image::new(ImageSource::from((
-                format!("bytes://graph{}.svg", self.dumb_counter),
-                svg::Document::new()
-                    .set("viewBox", (0, 0, 1000, 1000))
-                    .add(self.svg_path.clone())
-                    .to_string()
-                    .into_bytes(),
-            ))));
+            ui.add({
+                let image = egui::Image::new(ImageSource::from((
+                    format!("bytes://graph{}.svg", self.dumb_counter),
+                    svg::Document::new()
+                        .set("viewBox", (0, 0, 1000, 1000))
+                        .add(self.svg_path.clone())
+                        .to_string()
+                        .into_bytes(),
+                )));
+                if cfg!(target_arch = "wasm32") {
+                    image.max_size([4096.0, 4096.0].into())
+                } else {
+                    image
+                }
+            });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 powered_by_egui_and_eframe(ui);
