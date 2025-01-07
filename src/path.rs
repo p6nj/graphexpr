@@ -31,10 +31,9 @@ pub fn graph(expr: &str, points: u32) -> Result<path::Data, fasteval::Error> {
         })
         .flatten()
         .fold_with(path::Data::new(), |data, (a, b)| link(data, a, b))
-        .reduce(
-            || path::Data::new(),
-            |d1, d2| path::Data::from([d1.as_ref(), d2.as_ref()].concat()),
-        ))
+        .reduce(path::Data::new, |d1, d2| {
+            path::Data::from([d1.as_ref(), d2.as_ref()].concat())
+        }))
 }
 
 fn link(data: path::Data, a: Point, b: Point) -> path::Data {
