@@ -111,9 +111,33 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("GraphExpr");
-            ui.collapsing("What is this?", |ui| {
-                ui.label("Hello");
+            ui.collapsing("About the tool", |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("GraphExpr is a tool to draw graphs from expressions.\nThe graphs generated are made of a custom amount of points all evenly scattered on an invisible circle. One point ");
+                    ui.monospace("a");
+                    ui.label(" is linked to the other ");
+                    ui.monospace("b");
+                    ui.label(" if the expression given is true for them. For example, given ");
+                    ui.monospace("a % b == 0");
+                    ui.label(", point 15 will be linked to point 5 because 15 is a multiple of 5 and so ");
+                    ui.monospace("15 % 5 == 0");
+                    ui.label(" is evaluated to be true.\nBecause the expression actually returns a real number, any expression which evaluates to a non-zero value is considered as true. For example, ");
+                    ui.monospace("7");
+                    ui.label(", ");
+                    ui.monospace("a / 0");
+                    ui.label(" or ");
+                    ui.monospace("a");
+                    ui.label(" will always be true (the first point is '1').\n\nThis app uses the ");
+                    ui.monospace("fasteval");
+                    ui.spacing_mut().item_spacing.x = 0f32;
+                    ui.label("library. To know which symbols your expression can contain, check out the documentation ");
+                    ui.hyperlink_to("here", "https://docs.rs/fasteval/0.2");
+                    ui.label(".");
+                });
             });
+
+            ui.add_space(12.0);
+
             ui.horizontal(|ui| {
                 let label = ui.label("Expression: ").id;
                 ui.add(
@@ -132,7 +156,8 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .range(1f32..=f32::MAX)
                             .fixed_decimals(0),
                     )
-                    .labelled_by(ui.label("Number of points").id);
+                    .labelled_by(ui.label("Number of points").id)
+                    .on_hover_text("Number of points on the invisible circle. Make it huge and watch your computer burn!");
                 });
                 ui.horizontal(|ui| {
                     ui.add(
@@ -140,9 +165,12 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .speed(0.001)
                             .range(0f32..=20f32),
                     )
-                    .labelled_by(ui.label("Stroke width").id);
+                    .labelled_by(ui.label("Stroke width").id)
+                    .on_hover_text("Width of each line. You want this proportional to the number of points so it's not filling everything but you can still see the graph.");
                 });
             });
+
+            ui.add_space(12.0);
 
             ui.horizontal(|ui| {
                 if ui.button("Preview").clicked() {
