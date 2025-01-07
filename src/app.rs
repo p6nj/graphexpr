@@ -10,9 +10,9 @@ use rfd::FileDialog;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[cfg(target_arch = "wasm32")]
-#[wasm_bindgen(
-    inline_js = "export function download(bytes) { window.open(URL.createObjectURL(new Blob([bytes], { type: 'image/svg' })), '_blank').focus(); }"
-)]
+#[wasm_bindgen(inline_js = "export function download(bytes) { \
+                            window.open(URL.createObjectURL(new Blob([bytes], { type: \
+                            'image/svg' })), '_blank').focus(); }")]
 extern "C" {
     fn download(bytes: Vec<u8>) -> u32;
 }
@@ -113,24 +113,40 @@ impl<'a> eframe::App for GraphExpr<'a> {
             ui.heading("GraphExpr");
             ui.collapsing("About the tool", |ui| {
                 ui.horizontal_wrapped(|ui| {
-                    ui.label("GraphExpr is a tool to draw graphs from expressions.\nThe graphs generated are made of a custom amount of points all evenly scattered on an invisible circle. One point ");
+                    ui.label(
+                        "GraphExpr is a tool to draw graphs from expressions.\nThe graphs \
+                         generated are made of a custom amount of points all evenly scattered on \
+                         an invisible circle. One point ",
+                    );
                     ui.monospace("a");
                     ui.label(" is linked to the other ");
                     ui.monospace("b");
                     ui.label(" if the expression given is true for them. For example, given ");
                     ui.monospace("a % b == 0");
-                    ui.label(", point 15 will be linked to point 5 because 15 is a multiple of 5 and so ");
+                    ui.label(
+                        ", point 15 will be linked to point 5 because 15 is a multiple of 5 and \
+                         so ",
+                    );
                     ui.monospace("15 % 5 == 0");
-                    ui.label(" is evaluated to be true.\nBecause the expression actually returns a real number, any expression which evaluates to a non-zero value is considered as true. For example, ");
+                    ui.label(
+                        " is evaluated to be true.\nBecause the expression actually returns a \
+                         real number, any expression which evaluates to a non-zero value is \
+                         considered as true. For example, ",
+                    );
                     ui.monospace("7");
                     ui.label(", ");
                     ui.monospace("a / 0");
                     ui.label(" or ");
                     ui.monospace("a");
-                    ui.label(" will always be true (the first point is '1').\n\nThis app uses the ");
+                    ui.label(
+                        " will always be true (the first point is '1').\n\nThis app uses the ",
+                    );
                     ui.monospace("fasteval");
                     ui.spacing_mut().item_spacing.x = 0f32;
-                    ui.label("library. To know which symbols your expression can contain, check out the documentation ");
+                    ui.label(
+                        "library. To know which symbols your expression can contain, check out \
+                         the documentation ",
+                    );
                     ui.hyperlink_to("here", "https://docs.rs/fasteval/0.2");
                     ui.label(".");
                 });
@@ -157,7 +173,10 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .fixed_decimals(0),
                     )
                     .labelled_by(ui.label("Number of points").id)
-                    .on_hover_text("Number of points on the invisible circle. Make it huge and watch your computer burn!");
+                    .on_hover_text(
+                        "Number of points on the invisible circle. Make it huge and watch your \
+                         computer burn!",
+                    );
                 });
                 ui.horizontal(|ui| {
                     ui.add(
@@ -166,7 +185,10 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .range(0f32..=20f32),
                     )
                     .labelled_by(ui.label("Stroke width").id)
-                    .on_hover_text("Width of each line. You want this proportional to the number of points so it's not filling everything but you can still see the graph.");
+                    .on_hover_text(
+                        "Width of each line. You want this proportional to the number of points \
+                         so it's not filling everything but you can still see the graph.",
+                    );
                 });
             });
 
