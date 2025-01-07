@@ -26,7 +26,7 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 svg = "0.18"
 egui_dialogs = { git = "https://github.com/p6nj/egui_dialogs", branch = "master" }
-fasteval = "0.2.4"
+fasteval = "0.2"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -37,7 +37,7 @@ rfd = "0.15"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "*"
 wasm-bindgen-futures = "0.4"
-web-sys = "0.3.70"           # to access the DOM (to hide the loading text)
+web-sys = "0.3"           # to access the DOM (to hide the loading text)
 
 [profile.release]
 opt-level = 2 # fast and small wasm
