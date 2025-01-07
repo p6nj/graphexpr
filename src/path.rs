@@ -24,24 +24,24 @@ pub fn graph(expr: &str, points: u16) -> Result<path::Data, fasteval::Error> {
         .into_par_iter()
         .flat_map(|(a, b)| -> Option<(Point, Point)> {
             let mut map = BTreeMap::from([("a", a as f64), ("b", b as f64)]);
-            match compiled.eval(&slab, &mut map) {
-                Ok(v) if v != 0.0 => Some((get_coordinates(a, points), get_coordinates(b, points))),
-                _ => match {
+            compiled
+                .eval(&slab, &mut map)
+                .iter()
+                .find(|v| v != &&0.0)
+                .or({
+                    // try the other way around
                     map.insert("a", b as f64);
                     map.insert("b", a as f64);
-                    compiled.eval(&slab, &mut map)
-                } {
-                    Ok(v) if v != 0.0 => {
-                        Some((get_coordinates(a, points), get_coordinates(b, points)))
-                    }
-                    _ => None,
-                },
-            }
+                    compiled.eval(&slab, &mut map).iter().find(|v| v != &&0.0)
+                })
+                .is_some()
+                .then(|| (get_coordinates(a, points), get_coordinates(b, points)))
         })
         .fold_with(path::Data::new(), |data, (a, b)| link(data, a, b))
         .reduce(path::Data::new, |d1, d2| {
             path::Data::from([d1.as_ref(), d2.as_ref()].concat())
         });
+
     log::debug!("{result:?}");
     log::debug!(
         "Done for the graph in {} seconds.",
