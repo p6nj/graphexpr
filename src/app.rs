@@ -300,6 +300,16 @@ impl<'a> eframe::App for GraphExpr<'a> {
 }
 
 fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
+    #[cfg(target_arch = "wasm32")]
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 0.0;
+        ui.label("Download the app on ");
+        ui.hyperlink_to(
+            "GitHub",
+            "https://github.com/p6nj/graphexpr/releases/latest",
+        );
+        ui.label(" and use all your processors!");
+    });
     ui.label(
         "Note: You can change the stroke width without redrawing the entire thing. \
                          You just have to wait for the image to reload.",
