@@ -1,6 +1,7 @@
-use std::{collections::BTreeMap, f64::consts::PI, time::Instant};
+use std::{collections::BTreeMap, f64::consts::PI};
 
 use cached::proc_macro::cached;
+use chrono::Utc;
 use fasteval::{Compiler, Evaler};
 use humanize_duration::prelude::DurationExt;
 use itertools::Itertools;
@@ -11,14 +12,13 @@ type Point = (f32, f32);
 
 #[cached]
 pub fn graph(expr: String, points: u16) -> Result<path::Data, fasteval::Error> {
-    log::debug!("Drawing graph...");
-    let current_time = Instant::now();
     let mut slab = fasteval::Slab::new();
     let compiled = fasteval::Parser::new()
         .parse(&expr, &mut slab.ps)?
         .from(&slab.ps)
         .compile(&slab.ps, &mut slab.cs);
-    log::debug!("Expression compiled.");
+    log::debug!("Expression compiled, drawing graph...");
+    let start_time = Utc::now();
 
     let result = (1..=points)
         .tuple_combinations()
@@ -44,12 +44,14 @@ pub fn graph(expr: String, points: u16) -> Result<path::Data, fasteval::Error> {
             path::Data::from([d1.as_ref(), d2.as_ref()].concat())
         });
 
-    log::debug!("{result:?}");
+    log::trace!("{result:?}");
     log::debug!(
         "Done for the graph in {} seconds.",
-        current_time
-            .elapsed()
-            .human(humanize_duration::Truncate::Millis)
+        {
+            let res = (Utc::now() - start_time).to_std();
+            unsafe { res.unwrap_unchecked() }
+        }
+        .human(humanize_duration::Truncate::Millis)
     );
 
     Ok(result)
