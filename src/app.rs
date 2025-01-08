@@ -195,7 +195,13 @@ impl<'a> eframe::App for GraphExpr<'a> {
             ui.add_space(12.0);
 
             ui.horizontal(|ui| {
-                if ui.button("Preview").clicked() {
+                if ui
+                    .button("Preview")
+                    .on_hover_text(
+                        "Preview the graph (loading the image will take additional time)",
+                    )
+                    .clicked()
+                {
                     match super::path::graph(self.expr.clone(), self.points) {
                         Ok(path_data) => {
                             self.svg_path = self
@@ -211,7 +217,11 @@ impl<'a> eframe::App for GraphExpr<'a> {
                         ),
                     };
                 }
-                if ui.button("Save").clicked() {
+                if ui
+                    .button("Save")
+                    .on_hover_text("Save it only (saves loading time)")
+                    .clicked()
+                {
                     match super::path::graph(self.expr.clone(), self.points) {
                         Ok(path_data) => {
                             let document = svg::Document::new()
@@ -290,6 +300,10 @@ impl<'a> eframe::App for GraphExpr<'a> {
 }
 
 fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
+    ui.label(
+        "Note: You can change the stroke width without redrawing the entire thing. \
+                         You just have to wait for the image to reload.",
+    );
     ui.horizontal(|ui| {
         ui.spacing_mut().item_spacing.x = 0.0;
         ui.label("Powered by ");
