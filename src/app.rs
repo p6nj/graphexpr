@@ -196,7 +196,7 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
             ui.horizontal(|ui| {
                 if ui.button("Preview").clicked() {
-                    match super::path::graph(&self.expr, self.points) {
+                    match super::path::graph(self.expr.clone(), self.points) {
                         Ok(path_data) => {
                             self.svg_path = self
                                 .svg_path
@@ -212,7 +212,7 @@ impl<'a> eframe::App for GraphExpr<'a> {
                     };
                 }
                 if ui.button("Save").clicked() {
-                    match super::path::graph(&self.expr, self.points) {
+                    match super::path::graph(self.expr.clone(), self.points) {
                         Ok(path_data) => {
                             let document = svg::Document::new()
                                 .set("viewBox", (0, 0, 1000, 1000))

@@ -1,5 +1,6 @@
 use std::{collections::BTreeMap, f64::consts::PI, time::Instant};
 
+use cached::proc_macro::cached;
 use fasteval::{Compiler, Evaler};
 use humanize_duration::prelude::DurationExt;
 use itertools::Itertools;
@@ -8,12 +9,13 @@ use svg::node::element::path;
 
 type Point = (f32, f32);
 
-pub fn graph(expr: &str, points: u16) -> Result<path::Data, fasteval::Error> {
+#[cached]
+pub fn graph(expr: String, points: u16) -> Result<path::Data, fasteval::Error> {
     log::debug!("Drawing graph...");
     let current_time = Instant::now();
     let mut slab = fasteval::Slab::new();
     let compiled = fasteval::Parser::new()
-        .parse(expr, &mut slab.ps)?
+        .parse(&expr, &mut slab.ps)?
         .from(&slab.ps)
         .compile(&slab.ps, &mut slab.cs);
     log::debug!("Expression compiled.");
