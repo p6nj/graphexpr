@@ -252,7 +252,10 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             }
                             .save_file()
                             {
-                                if let Err(e) = svg::save(path.clone(), &document) {
+                                if let Some(folder) = path.parent() {
+                                    self.last_save_path = Some(folder.to_path_buf());
+                                }
+                                if let Err(e) = svg::save(path, &document) {
                                     self.dialogs.error(
                                         "I/O Error :(",
                                         format!(
@@ -261,7 +264,6 @@ impl<'a> eframe::App for GraphExpr<'a> {
                                         ),
                                     );
                                 }
-                                self.last_save_path = Some(path);
                             }
                         }
                         Err(e) => self.dialogs.error(
