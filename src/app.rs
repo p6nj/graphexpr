@@ -1,9 +1,15 @@
 use core::f32;
+#[cfg(target_arch = "wasm32")]
+use std::collections::BTreeMap;
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::PathBuf;
 
+#[cfg(target_arch = "wasm32")]
+use cached::proc_macro::cached;
 use egui::ImageSource;
 use egui_dialogs::Dialogs;
+#[cfg(target_arch = "wasm32")]
+use fasteval::{Compiler, Evaler};
 #[cfg(not(target_arch = "wasm32"))]
 use rfd::FileDialog;
 #[cfg(target_arch = "wasm32")]
@@ -272,6 +278,14 @@ impl<'a> eframe::App for GraphExpr<'a> {
                         ),
                     };
                 }
+                #[cfg(target_arch = "wasm32")]
+                ui.label(format!(
+                    "Expression is {}",
+                    match expression_status(self.expr.clone()) {
+                        Some(_) => "valid",
+                        None => "invalid",
+                    }
+                ));
             });
             if self.reload_image {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
@@ -299,6 +313,20 @@ impl<'a> eframe::App for GraphExpr<'a> {
             });
         });
     }
+}
+
+#[cfg(target_arch = "wasm32")]
+#[cached]
+fn expression_status(expr: String) -> Option<()> {
+    let mut slab = fasteval::Slab::new();
+    let compiled = fasteval::Parser::new()
+        .parse(&expr, &mut slab.ps)
+        .ok()?
+        .from(&slab.ps)
+        .compile(&slab.ps, &mut slab.cs);
+    let mut map = BTreeMap::from([("a", 1f64), ("b", 2f64)]);
+    let _ = compiled.eval(&slab, &mut map).ok()?;
+    Some(())
 }
 
 fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
