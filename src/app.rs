@@ -342,7 +342,8 @@ fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
     });
     ui.label(
         "Note: You can change the stroke width without redrawing the entire thing. \
-                         You just have to wait for the image to reload.",
+                         You just have to wait for the image to reload. \
+                         Also, the app works offline.",
     );
     ui.horizontal(|ui| {
         ui.spacing_mut().item_spacing.x = 0.0;
