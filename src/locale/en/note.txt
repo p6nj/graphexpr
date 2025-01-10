@@ -1,0 +1,1 @@
+Note: You can change the stroke width without redrawing the entire thing. You just have to wait for the image to reload. Also, the app works offline.

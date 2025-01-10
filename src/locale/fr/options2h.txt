@@ -1,0 +1,1 @@
+Epaisseur des lignes. L'idéal est une épaisseur proportionnelle au nombre de points pour que le graphe reste visible sans être saturé non-plus.

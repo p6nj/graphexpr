@@ -3,6 +3,7 @@ use core::f32;
 use std::collections::BTreeMap;
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::PathBuf;
+use std::str::FromStr;
 
 #[cfg(target_arch = "wasm32")]
 use cached::proc_macro::cached;
@@ -12,6 +13,7 @@ use egui_dialogs::Dialogs;
 use fasteval::{Compiler, Evaler};
 #[cfg(not(target_arch = "wasm32"))]
 use rfd::FileDialog;
+use sys_locale::get_locale;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -40,6 +42,25 @@ pub struct GraphExpr<'a> {
     dumb_counter: u16,
     #[serde(skip)]
     reload_image: bool,
+    #[serde(skip)]
+    locale: Locale,
+}
+
+#[derive(Default)]
+enum Locale {
+    French,
+    #[default]
+    English,
+}
+
+impl FromStr for Locale {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.contains("fr")
+            .then_some(Locale::French)
+            .or_else(|| s.contains("en").then_some(Locale::English))
+            .ok_or(())
+    }
 }
 
 impl<'a> Default for GraphExpr<'a> {
@@ -57,6 +78,9 @@ impl<'a> Default for GraphExpr<'a> {
             last_save_path: None,
             dumb_counter: 0,
             reload_image: false,
+            locale: get_locale()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or_default(),
         }
     }
 }
@@ -118,43 +142,55 @@ impl<'a> eframe::App for GraphExpr<'a> {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("GraphExpr");
             ui.collapsing("About the tool", |ui| {
-                ui.horizontal_wrapped(|ui| {
-                    ui.label(
-                        "GraphExpr is a tool to draw graphs from expressions.\nThe graphs \
-                         generated are made of a custom amount of points all evenly scattered on \
-                         an invisible circle. One point ",
-                    );
-                    ui.monospace("a");
-                    ui.label(" is linked to the other ");
-                    ui.monospace("b");
-                    ui.label(" if the expression given is true for them. For example, given ");
-                    ui.monospace("a % b == 0");
-                    ui.label(
-                        ", point 15 will be linked to point 5 because 15 is a multiple of 5 and \
-                         so ",
-                    );
-                    ui.monospace("15 % 5 == 0");
-                    ui.label(
-                        " is evaluated to be true.\nBecause the expression actually returns a \
-                         real number, any expression which evaluates to a non-zero value is \
-                         considered as true. For example, ",
-                    );
-                    ui.monospace("7");
-                    ui.label(", ");
-                    ui.monospace("a / 0");
-                    ui.label(" or ");
-                    ui.monospace("a");
-                    ui.label(
-                        " will always be true (the first point is '1').\n\nThis app uses the ",
-                    );
-                    ui.monospace("fasteval");
-                    ui.spacing_mut().item_spacing.x = 0f32;
-                    ui.label(
-                        "library. To know which symbols your expression can contain, check out \
-                         the documentation ",
-                    );
-                    ui.hyperlink_to("here", "https://docs.rs/fasteval/0.2");
-                    ui.label(".");
+                ui.horizontal_wrapped(|ui| match self.locale {
+                    Locale::French => {
+                        ui.label(include_str!("locale/fr/info1.txt"));
+                        ui.monospace("a");
+                        ui.label(include_str!("locale/fr/info2.txt"));
+                        ui.monospace("b");
+                        ui.label(include_str!("locale/fr/info3.txt"));
+                        ui.monospace("a % b == 0");
+                        ui.label(include_str!("locale/fr/info4.txt"));
+                        ui.monospace("15 % 5 == 0");
+                        ui.label(include_str!("locale/fr/info5.txt"));
+                        ui.monospace("7");
+                        ui.label(", ");
+                        ui.monospace("a / 0");
+                        ui.label(include_str!("locale/fr/info6.txt"));
+                        ui.monospace("a");
+                        ui.label(include_str!("locale/fr/info7.txt"));
+                        ui.monospace("fasteval");
+                        ui.label(include_str!("locale/fr/info8.txt"));
+                        ui.hyperlink_to(
+                            include_str!("locale/fr/info9.txt"),
+                            "https://docs.rs/fasteval/0.2",
+                        );
+                        ui.label(".");
+                    }
+                    Locale::English => {
+                        ui.label(include_str!("locale/en/info1.txt"));
+                        ui.monospace("a");
+                        ui.label(include_str!("locale/en/info2.txt"));
+                        ui.monospace("b");
+                        ui.label(include_str!("locale/en/info3.txt"));
+                        ui.monospace("a % b == 0");
+                        ui.label(include_str!("locale/en/info4.txt"));
+                        ui.monospace("15 % 5 == 0");
+                        ui.label(include_str!("locale/en/info5.txt"));
+                        ui.monospace("7");
+                        ui.label(", ");
+                        ui.monospace("a / 0");
+                        ui.label(include_str!("locale/en/info6.txt"));
+                        ui.monospace("a");
+                        ui.label(include_str!("locale/en/info7.txt"));
+                        ui.monospace("fasteval");
+                        ui.label(include_str!("locale/en/info8.txt"));
+                        ui.hyperlink_to(
+                            include_str!("locale/en/info9.txt"),
+                            "https://docs.rs/fasteval/0.2",
+                        );
+                        ui.label(".");
+                    }
                 });
             });
 
@@ -178,11 +214,17 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .range(1f32..=f32::MAX)
                             .fixed_decimals(0),
                     )
-                    .labelled_by(ui.label("Number of points").id)
-                    .on_hover_text(
-                        "Number of points on the invisible circle. Make it huge and watch your \
-                         computer burn!",
-                    );
+                    .labelled_by(
+                        ui.label(match self.locale {
+                            Locale::English => include_str!("locale/en/options1.txt"),
+                            Locale::French => include_str!("locale/fr/options1.txt"),
+                        })
+                        .id,
+                    )
+                    .on_hover_text(match self.locale {
+                        Locale::English => include_str!("locale/en/options1h.txt"),
+                        Locale::French => include_str!("locale/fr/options1h.txt"),
+                    });
                 });
                 ui.horizontal(|ui| {
                     ui.add(
@@ -190,11 +232,17 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .speed(0.001)
                             .range(0f32..=20f32),
                     )
-                    .labelled_by(ui.label("Stroke width").id)
-                    .on_hover_text(
-                        "Width of each line. You want this proportional to the number of points \
-                         so it's not filling everything but you can still see the graph.",
-                    );
+                    .labelled_by(
+                        ui.label(match self.locale {
+                            Locale::English => include_str!("locale/en/options2.txt"),
+                            Locale::French => include_str!("locale/fr/options2.txt"),
+                        })
+                        .id,
+                    )
+                    .on_hover_text(match self.locale {
+                        Locale::English => include_str!("locale/en/options2h.txt"),
+                        Locale::French => include_str!("locale/fr/options2h.txt"),
+                    });
                 });
             });
 
@@ -202,10 +250,14 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
             ui.horizontal(|ui| {
                 if ui
-                    .button("Preview")
-                    .on_hover_text(
-                        "Preview the graph (loading the image will take additional time)",
-                    )
+                    .button(match self.locale {
+                        Locale::English => include_str!("locale/en/action1.txt"),
+                        Locale::French => include_str!("locale/fr/action1.txt"),
+                    })
+                    .on_hover_text(match self.locale {
+                        Locale::English => include_str!("locale/en/action1h.txt"),
+                        Locale::French => include_str!("locale/fr/action1h.txt"),
+                    })
                     .clicked()
                 {
                     match super::path::graph(self.expr.clone(), self.points) {
@@ -218,14 +270,30 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             self.reload_image = true;
                         }
                         Err(e) => self.dialogs.error(
-                            "Parsing error :O",
-                            format!("Your expression doesn't look right: {e}"),
+                            match self.locale {
+                                Locale::English => include_str!("locale/en/error1t.txt"),
+                                Locale::French => include_str!("locale/fr/error1t.txt"),
+                            },
+                            format!(
+                                "{}: {}",
+                                match self.locale {
+                                    Locale::English => include_str!("locale/en/error1.txt"),
+                                    Locale::French => include_str!("locale/fr/error1.txt"),
+                                },
+                                e
+                            ),
                         ),
                     };
                 }
                 if ui
-                    .button("Save")
-                    .on_hover_text("Save it only (saves loading time)")
+                    .button(match self.locale {
+                        Locale::English => include_str!("locale/en/action2.txt"),
+                        Locale::French => include_str!("locale/fr/action2.txt"),
+                    })
+                    .on_hover_text(match self.locale {
+                        Locale::English => include_str!("locale/en/action2h.txt"),
+                        Locale::French => include_str!("locale/fr/action2h.txt"),
+                    })
                     .clicked()
                 {
                     match super::path::graph(self.expr.clone(), self.points) {
@@ -263,9 +331,20 @@ impl<'a> eframe::App for GraphExpr<'a> {
                                 }
                                 if let Err(e) = svg::save(path, &document) {
                                     self.dialogs.error(
-                                        "I/O Error :(",
+                                        match self.locale {
+                                            Locale::English => {
+                                                include_str!("locale/en/error2t.txt")
+                                            }
+                                            Locale::French => include_str!("locale/fr/error2t.txt"),
+                                        },
                                         format!(
-                                            "Here's what your computer has to say about it: {:?}",
+                                            "{}: {:?}",
+                                            match self.locale {
+                                                Locale::English =>
+                                                    include_str!("locale/en/error2.txt"),
+                                                Locale::French =>
+                                                    include_str!("locale/fr/error2.txt"),
+                                            },
                                             e
                                         ),
                                     );
@@ -273,14 +352,28 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             }
                         }
                         Err(e) => self.dialogs.error(
-                            "Parsing error :O",
-                            format!("Your expression doesn't look right: {e}"),
+                            match self.locale {
+                                Locale::English => include_str!("locale/en/error1t.txt"),
+                                Locale::French => include_str!("locale/fr/error1t.txt"),
+                            },
+                            format!(
+                                "{}: {}",
+                                match self.locale {
+                                    Locale::English => include_str!("locale/en/error1.txt"),
+                                    Locale::French => include_str!("locale/fr/error1.txt"),
+                                },
+                                e
+                            ),
                         ),
                     };
                 }
                 #[cfg(target_arch = "wasm32")]
                 ui.label(format!(
-                    "Expression is {}",
+                    "{} {}",
+                    match self.locale {
+                        Locale::English => include_str!("locale/en/exprstat.txt"),
+                        Locale::French => include_str!("locale/fr/exprstat.txt"),
+                    },
                     match expression_status(self.expr.clone()) {
                         Some(_) => "valid",
                         None => "invalid",
@@ -308,7 +401,7 @@ impl<'a> eframe::App for GraphExpr<'a> {
             });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                powered_by_egui_and_eframe(ui);
+                powered_by_egui_and_eframe(ui, &self.locale);
                 egui::warn_if_debug_build(ui);
             });
         });
@@ -329,31 +422,55 @@ fn expression_status(expr: String) -> Option<()> {
     Some(())
 }
 
-fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
-    #[cfg(target_arch = "wasm32")]
-    ui.horizontal(|ui| {
-        ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label("Download the app on ");
-        ui.hyperlink_to(
-            "GitHub",
-            "https://github.com/p6nj/graphexpr/releases/latest",
-        );
-        ui.label(" and use all your processors!");
-    });
-    ui.label(
-        "Note: You can change the stroke width without redrawing the entire thing. \
-                         You just have to wait for the image to reload. \
-                         Also, the app works offline.",
-    );
-    ui.horizontal(|ui| {
-        ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label("Powered by ");
-        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-        ui.label(" and ");
-        ui.hyperlink_to(
-            "eframe",
-            "https://github.com/emilk/egui/tree/master/crates/eframe",
-        );
-        ui.label(".");
-    });
+fn powered_by_egui_and_eframe(ui: &mut egui::Ui, locale: &Locale) {
+    match locale {
+        Locale::English => {
+            #[cfg(target_arch = "wasm32")]
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(include_str!("locale/en/github1.txt"));
+                ui.hyperlink_to(
+                    "GitHub",
+                    "https://github.com/p6nj/graphexpr/releases/latest",
+                );
+                ui.label(include_str!("locale/en/github2.txt"));
+            });
+            ui.label(include_str!("locale/en/note.txt"));
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(include_str!("locale/en/libs1.txt"));
+                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+                ui.label(include_str!("locale/en/libs2.txt"));
+                ui.hyperlink_to(
+                    "eframe",
+                    "https://github.com/emilk/egui/tree/master/crates/eframe",
+                );
+                ui.label(".");
+            });
+        }
+        Locale::French => {
+            #[cfg(target_arch = "wasm32")]
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(include_str!("locale/fr/github1.txt"));
+                ui.hyperlink_to(
+                    "GitHub",
+                    "https://github.com/p6nj/graphexpr/releases/latest",
+                );
+                ui.label(include_str!("locale/fr/github2.txt"));
+            });
+            ui.label(include_str!("locale/fr/note.txt"));
+            ui.horizontal(|ui| {
+                ui.spacing_mut().item_spacing.x = 0.0;
+                ui.label(include_str!("locale/fr/libs1.txt"));
+                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+                ui.label(include_str!("locale/fr/libs2.txt"));
+                ui.hyperlink_to(
+                    "eframe",
+                    "https://github.com/emilk/egui/tree/master/crates/eframe",
+                );
+                ui.label(".");
+            });
+        }
+    }
 }

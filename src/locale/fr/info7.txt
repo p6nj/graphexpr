@@ -1,0 +1,3 @@
+seront toujours vraies (le premier point est le n°1).
+
+Cette appli utilise la librairie

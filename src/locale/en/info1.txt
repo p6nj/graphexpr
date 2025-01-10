@@ -1,0 +1,2 @@
+GraphExpr is a tool to draw graphs from expressions.
+The graphs generated are made of a custom amount of points all evenly scattered on an invisible circle. One point

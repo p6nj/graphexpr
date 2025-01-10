@@ -1,0 +1,2 @@
+is evaluated to be true.
+Because the expression actually returns a real number, any expression which evaluates to a non-zero value is considered as true. For example,
