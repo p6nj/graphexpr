@@ -141,58 +141,64 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("GraphExpr");
-            ui.collapsing("About the tool", |ui| {
-                ui.horizontal_wrapped(|ui| match self.locale {
-                    Locale::French => {
-                        ui.label(include_str!("locale/fr/info1.txt"));
-                        ui.monospace("a");
-                        ui.label(include_str!("locale/fr/info2.txt"));
-                        ui.monospace("b");
-                        ui.label(include_str!("locale/fr/info3.txt"));
-                        ui.monospace("a % b == 0");
-                        ui.label(include_str!("locale/fr/info4.txt"));
-                        ui.monospace("15 % 5 == 0");
-                        ui.label(include_str!("locale/fr/info5.txt"));
-                        ui.monospace("7");
-                        ui.label(", ");
-                        ui.monospace("a / 0");
-                        ui.label(include_str!("locale/fr/info6.txt"));
-                        ui.monospace("a");
-                        ui.label(include_str!("locale/fr/info7.txt"));
-                        ui.monospace("fasteval");
-                        ui.label(include_str!("locale/fr/info8.txt"));
-                        ui.hyperlink_to(
-                            include_str!("locale/fr/info9.txt"),
-                            "https://docs.rs/fasteval/0.2",
-                        );
-                        ui.label(".");
-                    }
-                    Locale::English => {
-                        ui.label(include_str!("locale/en/info1.txt"));
-                        ui.monospace("a");
-                        ui.label(include_str!("locale/en/info2.txt"));
-                        ui.monospace("b");
-                        ui.label(include_str!("locale/en/info3.txt"));
-                        ui.monospace("a % b == 0");
-                        ui.label(include_str!("locale/en/info4.txt"));
-                        ui.monospace("15 % 5 == 0");
-                        ui.label(include_str!("locale/en/info5.txt"));
-                        ui.monospace("7");
-                        ui.label(", ");
-                        ui.monospace("a / 0");
-                        ui.label(include_str!("locale/en/info6.txt"));
-                        ui.monospace("a");
-                        ui.label(include_str!("locale/en/info7.txt"));
-                        ui.monospace("fasteval");
-                        ui.label(include_str!("locale/en/info8.txt"));
-                        ui.hyperlink_to(
-                            include_str!("locale/en/info9.txt"),
-                            "https://docs.rs/fasteval/0.2",
-                        );
-                        ui.label(".");
-                    }
-                });
-            });
+            ui.collapsing(
+                match self.locale {
+                    Locale::French => include_str!("locale/fr/about.txt"),
+                    Locale::English => include_str!("locale/en/about.txt"),
+                },
+                |ui| {
+                    ui.horizontal_wrapped(|ui| match self.locale {
+                        Locale::French => {
+                            ui.label(include_str!("locale/fr/info1.txt"));
+                            ui.monospace("a");
+                            ui.label(include_str!("locale/fr/info2.txt"));
+                            ui.monospace("b");
+                            ui.label(include_str!("locale/fr/info3.txt"));
+                            ui.monospace("a % b == 0");
+                            ui.label(include_str!("locale/fr/info4.txt"));
+                            ui.monospace("15 % 5 == 0");
+                            ui.label(include_str!("locale/fr/info5.txt"));
+                            ui.monospace("7");
+                            ui.label(", ");
+                            ui.monospace("a / 0");
+                            ui.label(include_str!("locale/fr/info6.txt"));
+                            ui.monospace("a");
+                            ui.label(include_str!("locale/fr/info7.txt"));
+                            ui.monospace("fasteval");
+                            ui.label(include_str!("locale/fr/info8.txt"));
+                            ui.hyperlink_to(
+                                include_str!("locale/fr/info9.txt"),
+                                "https://docs.rs/fasteval/0.2",
+                            );
+                            ui.label(".");
+                        }
+                        Locale::English => {
+                            ui.label(include_str!("locale/en/info1.txt"));
+                            ui.monospace("a");
+                            ui.label(include_str!("locale/en/info2.txt"));
+                            ui.monospace("b");
+                            ui.label(include_str!("locale/en/info3.txt"));
+                            ui.monospace("a % b == 0");
+                            ui.label(include_str!("locale/en/info4.txt"));
+                            ui.monospace("15 % 5 == 0");
+                            ui.label(include_str!("locale/en/info5.txt"));
+                            ui.monospace("7");
+                            ui.label(", ");
+                            ui.monospace("a / 0");
+                            ui.label(include_str!("locale/en/info6.txt"));
+                            ui.monospace("a");
+                            ui.label(include_str!("locale/en/info7.txt"));
+                            ui.monospace("fasteval");
+                            ui.label(include_str!("locale/en/info8.txt"));
+                            ui.hyperlink_to(
+                                include_str!("locale/en/info9.txt"),
+                                "https://docs.rs/fasteval/0.2",
+                            );
+                            ui.label(".");
+                        }
+                    });
+                },
+            );
 
             ui.add_space(12.0);
 
@@ -374,9 +380,15 @@ impl<'a> eframe::App for GraphExpr<'a> {
                         Locale::English => include_str!("locale/en/exprstat.txt"),
                         Locale::French => include_str!("locale/fr/exprstat.txt"),
                     },
-                    match expression_status(self.expr.clone()) {
-                        Some(_) => "valid",
-                        None => "invalid",
+                    match self.locale {
+                        Locale::English => match expression_status(self.expr.clone()) {
+                            Some(_) => include_str!("locale/en/valid.txt"),
+                            None => include_str!("locale/en/invalid.txt"),
+                        },
+                        Locale::French => match expression_status(self.expr.clone()) {
+                            Some(_) => include_str!("locale/fr/valid.txt"),
+                            None => include_str!("locale/fr/invalid.txt"),
+                        },
                     }
                 ));
             });
