@@ -1,4 +1,4 @@
-# eframe template
+# GraphExpr
 
 [![dependency status](https://deps.rs/repo/github/p6nj/graphexpr/status.svg)](https://deps.rs/repo/github/p6nj/graphexpr)
 [![Build Status](https://github.com/p6nj/graphexpr/workflows/CI/badge.svg)](https://github.com/p6nj/graphexpr/actions?workflow=CI)
