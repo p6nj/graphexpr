@@ -1,0 +1,104 @@
+_version: 2
+action:
+  preview:
+    title:
+      en: "Preview"
+      fr: "Apperçu"
+    hover:
+      en: "Preview the graph (loading the image will take additional time)"
+      fr: "Afficher un apperçu du graphe (le chargement de l'image prend du temps supplémentaire)"
+  save:
+    title:
+      en: "Save"
+      fr: "Enregistrer"
+    hover:
+      en: "Save it only (saves loading time)"
+      fr: "Sauvegarder seulement (évite du temps de chargement de l'image)"
+error:
+  parsing:
+    body:
+      en: "Your expression doesn't look right: %{error}"
+      fr: "Ton expression n'a pas l'air valide: %{error}"
+    title:
+      en: "Parsing error :O"
+      fr: "Error de parsing :O"
+  io:
+    body:
+      en: "Here's what your computer has to say about it: %{error}"
+      fr: "Description de l'erreur: %{error}"
+    title:
+      en: "I/O Error :("
+      fr: "Erreur d'entrée/sortie :("
+exprstat:
+  body:
+    en: "Expression is %{status}"
+    fr: "L'expression est %{status}"
+  valid:
+    en: "valid"
+    fr: "valide"
+  invalid:
+    en: "invalid"
+    fr: "invalide"
+github:
+  1:
+    en: "Download the app on "
+    fr: "Téléchargez l'appli sur "
+  2:
+    en: " and use all your processors!"
+    fr: " et utilisez tous vos processeurs!"
+info:
+  title:
+    en: "About the tool"
+    fr: "Kézako"
+  1:
+    en: "GraphExpr is a tool to draw graphs from expressions.\nThe graphs generated are made of a custom amount of points all evenly scattered on an invisible circle. One point"
+    fr: "GraphExpr est un outil permettant de dessiner des graphes à partir d'une expression et d'un nombre défini de points sur un cercle invisible. Un point"
+  2:
+    en: "is linked to the other"
+    fr: "est relié à un autre point"
+  3:
+    en: "if the expression given is true for them. For example, given"
+    fr: "si l'expression donnée est vraie pour ces deux points. Par exemple, avec l'expression"
+  4:
+    en: ", point 15 will be linked to point 5 because 15 is a multiple of 5 and so"
+    fr: ", le point 15 sera relié au point 5 parce que 15 est multiple de 5 et donc l'expression"
+  5:
+    en: "is evaluated to be true.\nBecause the expression actually returns a real number, any expression which evaluates to a non-zero value is considered as true. For example,"
+    fr: "est évaluée vraie.\nComme l'expression retourne en fait un nombre réel, toute expression qui ne retourne pas zéro est considérée vraie. Par exemple,"
+  6:
+    en: "or"
+    fr: "et"
+  7:
+    en: "will always be true (the first point is '1').\n\nThis app uses the"
+    fr: "seront toujours vraies (le premier point est le n°1).\n\nCette appli utilise la librairie"
+  8:
+    en: "library. To know which symbols your expression can contain, check out the documentation"
+    fr: ". Pour une liste des symboles valides pour l'expression, visitez la documentation sur"
+  9:
+    en: "here"
+    fr: "ce lien"
+libs:
+  1:
+    en: "Powered by "
+    fr: "Cette appli fonctionne grâce à "
+  2:
+    en: " and "
+    fr: " et "
+note:
+  en: "Note: You can change the stroke width without redrawing the entire thing. You just have to wait for the image to reload. Also, the app works offline."
+  fr: "Note: Vous pouvez changer l'épaisseur du trait sans devoir re-générer le graphe. Vous devez simplement attendre que l'image recharge. Autre chose : l'appli fonctionne hors-ligne."
+option:
+  points:
+    title:
+      en: "Number of points"
+      fr: "Nombre de points"
+    hover:
+      en: "Number of points on the invisible circle. Make it huge and watch your computer burn!"
+      fr: "Plus il est haut, plus le résultat est phénoménal mais long à rendre."
+  stroke:
+    title:
+      en: "Stroke width"
+      fr: "Epaisseur du trait"
+    hover:
+      en: "Width of each line. You want this proportional to the number of points so it's not filling everything but you can still see the graph."
+      fr: "Epaisseur des lignes. L'idéal est une épaisseur proportionnelle au nombre de points pour que le graphe reste visible sans être saturé non-plus."
