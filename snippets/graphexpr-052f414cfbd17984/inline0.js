@@ -1,0 +1,1 @@
+export function download(bytes) { window.open(URL.createObjectURL(new Blob([bytes], { type: 'image/svg' })), '_blank').focus(); }
