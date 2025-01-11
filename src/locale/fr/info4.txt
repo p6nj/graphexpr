@@ -1,1 +1,0 @@
-, le point 15 sera relié au point 5 parce que 15 est multiple de 5 et donc l'expression

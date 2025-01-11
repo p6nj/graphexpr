@@ -1,7 +1,7 @@
 [package]
 name = "graphexpr"
 version = "0.2.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
+authors = ["p6nj <p6nj@fish.golf>"]
 edition = "2021"
 include = ["LICENSE-APACHE", "LICENSE-MIT", "**/*.rs", "Cargo.toml"]
 rust-version = "1.81"
@@ -21,8 +21,6 @@ eframe = { version = "0.30", default-features = false, features = [
     "wayland",       # To support Linux (and CI)
 ] }
 log = "0.4"
-
-# You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
 svg = "0.18"
 egui_dialogs = { git = "https://github.com/p6nj/egui_dialogs", branch = "master" }
@@ -32,6 +30,7 @@ itertools = "0.14.0"
 humanize-duration = "0.0.6"
 cached = "0.54.0"
 chrono = "0.4.39"
+rust-i18n = "3"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -63,3 +62,6 @@ opt-level = 2
 # If you fork https://github.com/emilk/egui you can test with:
 # egui = { path = "../egui/crates/egui" }
 # eframe = { path = "../egui/crates/eframe" }
+
+[package.metadata.i18n]
+available-locales = ["en", "fr"]

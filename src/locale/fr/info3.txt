@@ -1,1 +1,0 @@
-si l'expression donnée est vraie pour ces deux points. Par exemple, avec l'expression

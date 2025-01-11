@@ -1,1 +1,0 @@
-Afficher un apperçu du graphe (le chargement de l'image prend du temps supplémentaire)

@@ -1,1 +1,0 @@
-. Pour une liste des symboles valides pour l'expression, visitez la documentation sur

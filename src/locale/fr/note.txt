@@ -1,1 +1,0 @@
-Note: Vous pouvez changer l'épaisseur du trait sans devoir re-générer le graphe. Vous devez simplement attendre que l'image recharge. Autre chose : l'appli fonctionne hors-ligne.

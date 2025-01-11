@@ -1,1 +1,0 @@
-Number of points on the invisible circle. Make it huge and watch your computer burn!

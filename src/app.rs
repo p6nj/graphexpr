@@ -1,18 +1,15 @@
 use core::f32;
-#[cfg(target_arch = "wasm32")]
 use std::collections::BTreeMap;
 #[cfg(not(target_arch = "wasm32"))]
 use std::path::PathBuf;
-use std::str::FromStr;
 
-#[cfg(target_arch = "wasm32")]
 use cached::proc_macro::cached;
 use egui::ImageSource;
 use egui_dialogs::Dialogs;
-#[cfg(target_arch = "wasm32")]
 use fasteval::{Compiler, Evaler};
 #[cfg(not(target_arch = "wasm32"))]
 use rfd::FileDialog;
+use rust_i18n::t;
 use sys_locale::get_locale;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -42,25 +39,6 @@ pub struct GraphExpr<'a> {
     dumb_counter: u16,
     #[serde(skip)]
     reload_image: bool,
-    #[serde(skip)]
-    locale: Locale,
-}
-
-#[derive(Default)]
-enum Locale {
-    French,
-    #[default]
-    English,
-}
-
-impl FromStr for Locale {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        s.contains("fr")
-            .then_some(Locale::French)
-            .or_else(|| s.contains("en").then_some(Locale::English))
-            .ok_or(())
-    }
 }
 
 impl<'a> Default for GraphExpr<'a> {
@@ -78,9 +56,6 @@ impl<'a> Default for GraphExpr<'a> {
             last_save_path: None,
             dumb_counter: 0,
             reload_image: false,
-            locale: get_locale()
-                .and_then(|s| s.parse().ok())
-                .unwrap_or_default(),
         }
     }
 }
@@ -90,6 +65,10 @@ impl<'a> GraphExpr<'a> {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
+
+        if let Some(locale) = get_locale() {
+            rust_i18n::set_locale(&locale);
+        }
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
@@ -141,64 +120,29 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("GraphExpr");
-            ui.collapsing(
-                match self.locale {
-                    Locale::French => include_str!("locale/fr/about.txt"),
-                    Locale::English => include_str!("locale/en/about.txt"),
-                },
-                |ui| {
-                    ui.horizontal_wrapped(|ui| match self.locale {
-                        Locale::French => {
-                            ui.label(include_str!("locale/fr/info1.txt"));
-                            ui.monospace("a");
-                            ui.label(include_str!("locale/fr/info2.txt"));
-                            ui.monospace("b");
-                            ui.label(include_str!("locale/fr/info3.txt"));
-                            ui.monospace("a % b == 0");
-                            ui.label(include_str!("locale/fr/info4.txt"));
-                            ui.monospace("15 % 5 == 0");
-                            ui.label(include_str!("locale/fr/info5.txt"));
-                            ui.monospace("7");
-                            ui.label(", ");
-                            ui.monospace("a / 0");
-                            ui.label(include_str!("locale/fr/info6.txt"));
-                            ui.monospace("a");
-                            ui.label(include_str!("locale/fr/info7.txt"));
-                            ui.monospace("fasteval");
-                            ui.label(include_str!("locale/fr/info8.txt"));
-                            ui.hyperlink_to(
-                                include_str!("locale/fr/info9.txt"),
-                                "https://docs.rs/fasteval/0.2",
-                            );
-                            ui.label(".");
-                        }
-                        Locale::English => {
-                            ui.label(include_str!("locale/en/info1.txt"));
-                            ui.monospace("a");
-                            ui.label(include_str!("locale/en/info2.txt"));
-                            ui.monospace("b");
-                            ui.label(include_str!("locale/en/info3.txt"));
-                            ui.monospace("a % b == 0");
-                            ui.label(include_str!("locale/en/info4.txt"));
-                            ui.monospace("15 % 5 == 0");
-                            ui.label(include_str!("locale/en/info5.txt"));
-                            ui.monospace("7");
-                            ui.label(", ");
-                            ui.monospace("a / 0");
-                            ui.label(include_str!("locale/en/info6.txt"));
-                            ui.monospace("a");
-                            ui.label(include_str!("locale/en/info7.txt"));
-                            ui.monospace("fasteval");
-                            ui.label(include_str!("locale/en/info8.txt"));
-                            ui.hyperlink_to(
-                                include_str!("locale/en/info9.txt"),
-                                "https://docs.rs/fasteval/0.2",
-                            );
-                            ui.label(".");
-                        }
-                    });
-                },
-            );
+            ui.collapsing(t!("info.title"), |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(t!("info.1"));
+                    ui.monospace("a");
+                    ui.label(t!("info.2"));
+                    ui.monospace("b");
+                    ui.label(t!("info.3"));
+                    ui.monospace("a % b == 0");
+                    ui.label(t!("info.4"));
+                    ui.monospace("15 % 5 == 0");
+                    ui.label(t!("info.5"));
+                    ui.monospace("7");
+                    ui.label(", ");
+                    ui.monospace("a / 0");
+                    ui.label(t!("info.6"));
+                    ui.monospace("a");
+                    ui.label(t!("info.7"));
+                    ui.monospace("fasteval");
+                    ui.label(t!("info.8"));
+                    ui.hyperlink_to(t!("info.9"), "https://docs.rs/fasteval/0.2");
+                    ui.label(".");
+                });
+            });
 
             ui.add_space(12.0);
 
@@ -220,17 +164,8 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .range(1f32..=f32::MAX)
                             .fixed_decimals(0),
                     )
-                    .labelled_by(
-                        ui.label(match self.locale {
-                            Locale::English => include_str!("locale/en/options1.txt"),
-                            Locale::French => include_str!("locale/fr/options1.txt"),
-                        })
-                        .id,
-                    )
-                    .on_hover_text(match self.locale {
-                        Locale::English => include_str!("locale/en/options1h.txt"),
-                        Locale::French => include_str!("locale/fr/options1h.txt"),
-                    });
+                    .labelled_by(ui.label(t!("option.points.title")).id)
+                    .on_hover_text(t!("option.points.hover"));
                 });
                 ui.horizontal(|ui| {
                     ui.add(
@@ -238,17 +173,8 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             .speed(0.001)
                             .range(0f32..=20f32),
                     )
-                    .labelled_by(
-                        ui.label(match self.locale {
-                            Locale::English => include_str!("locale/en/options2.txt"),
-                            Locale::French => include_str!("locale/fr/options2.txt"),
-                        })
-                        .id,
-                    )
-                    .on_hover_text(match self.locale {
-                        Locale::English => include_str!("locale/en/options2h.txt"),
-                        Locale::French => include_str!("locale/fr/options2h.txt"),
-                    });
+                    .labelled_by(ui.label(t!("option.stroke.title")).id)
+                    .on_hover_text(t!("option.stroke.title"));
                 });
             });
 
@@ -256,14 +182,8 @@ impl<'a> eframe::App for GraphExpr<'a> {
 
             ui.horizontal(|ui| {
                 if ui
-                    .button(match self.locale {
-                        Locale::English => include_str!("locale/en/action1.txt"),
-                        Locale::French => include_str!("locale/fr/action1.txt"),
-                    })
-                    .on_hover_text(match self.locale {
-                        Locale::English => include_str!("locale/en/action1h.txt"),
-                        Locale::French => include_str!("locale/fr/action1h.txt"),
-                    })
+                    .button(t!("action.preview.title"))
+                    .on_hover_text(t!("action.preview.hover"))
                     .clicked()
                 {
                     match super::path::graph(self.expr.clone(), self.points) {
@@ -276,30 +196,14 @@ impl<'a> eframe::App for GraphExpr<'a> {
                             self.reload_image = true;
                         }
                         Err(e) => self.dialogs.error(
-                            match self.locale {
-                                Locale::English => include_str!("locale/en/error1t.txt"),
-                                Locale::French => include_str!("locale/fr/error1t.txt"),
-                            },
-                            format!(
-                                "{}: {}",
-                                match self.locale {
-                                    Locale::English => include_str!("locale/en/error1.txt"),
-                                    Locale::French => include_str!("locale/fr/error1.txt"),
-                                },
-                                e
-                            ),
+                            t!("error.parsing.title"),
+                            t!("error.parsing.body", error = e),
                         ),
                     };
                 }
                 if ui
-                    .button(match self.locale {
-                        Locale::English => include_str!("locale/en/action2.txt"),
-                        Locale::French => include_str!("locale/fr/action2.txt"),
-                    })
-                    .on_hover_text(match self.locale {
-                        Locale::English => include_str!("locale/en/action2h.txt"),
-                        Locale::French => include_str!("locale/fr/action2h.txt"),
-                    })
+                    .button(t!("action.save.title"))
+                    .on_hover_text(t!("action.save.hover"))
                     .clicked()
                 {
                     match super::path::graph(self.expr.clone(), self.points) {
@@ -337,60 +241,25 @@ impl<'a> eframe::App for GraphExpr<'a> {
                                 }
                                 if let Err(e) = svg::save(path, &document) {
                                     self.dialogs.error(
-                                        match self.locale {
-                                            Locale::English => {
-                                                include_str!("locale/en/error2t.txt")
-                                            }
-                                            Locale::French => include_str!("locale/fr/error2t.txt"),
-                                        },
-                                        format!(
-                                            "{}: {:?}",
-                                            match self.locale {
-                                                Locale::English =>
-                                                    include_str!("locale/en/error2.txt"),
-                                                Locale::French =>
-                                                    include_str!("locale/fr/error2.txt"),
-                                            },
-                                            e
-                                        ),
+                                        t!("error.io.title"),
+                                        t!("error.io.body", error = e),
                                     );
                                 }
                             }
                         }
                         Err(e) => self.dialogs.error(
-                            match self.locale {
-                                Locale::English => include_str!("locale/en/error1t.txt"),
-                                Locale::French => include_str!("locale/fr/error1t.txt"),
-                            },
-                            format!(
-                                "{}: {}",
-                                match self.locale {
-                                    Locale::English => include_str!("locale/en/error1.txt"),
-                                    Locale::French => include_str!("locale/fr/error1.txt"),
-                                },
-                                e
-                            ),
+                            t!("error.parsing.title"),
+                            t!("error.parsing.body", error = e),
                         ),
                     };
                 }
-                #[cfg(target_arch = "wasm32")]
-                ui.label(format!(
-                    "{} {}",
-                    match self.locale {
-                        Locale::English => include_str!("locale/en/exprstat.txt"),
-                        Locale::French => include_str!("locale/fr/exprstat.txt"),
-                    },
-                    match self.locale {
-                        Locale::English => match expression_status(self.expr.clone()) {
-                            Some(_) => include_str!("locale/en/valid.txt"),
-                            None => include_str!("locale/en/invalid.txt"),
-                        },
-                        Locale::French => match expression_status(self.expr.clone()) {
-                            Some(_) => include_str!("locale/fr/valid.txt"),
-                            None => include_str!("locale/fr/invalid.txt"),
-                        },
-                    }
-                ));
+                ui.label({
+                    let status = match expression_status(self.expr.clone()) {
+                        Some(_) => t!("exprstat.valid"),
+                        None => t!("exprstat.invalid"),
+                    };
+                    t!("exprstat.body", status = status)
+                });
             });
             if self.reload_image {
                 self.dumb_counter = self.dumb_counter.wrapping_add(1);
@@ -413,14 +282,13 @@ impl<'a> eframe::App for GraphExpr<'a> {
             });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-                powered_by_egui_and_eframe(ui, &self.locale);
+                powered_by_egui_and_eframe(ui);
                 egui::warn_if_debug_build(ui);
             });
         });
     }
 }
 
-#[cfg(target_arch = "wasm32")]
 #[cached]
 fn expression_status(expr: String) -> Option<()> {
     let mut slab = fasteval::Slab::new();
@@ -434,55 +302,27 @@ fn expression_status(expr: String) -> Option<()> {
     Some(())
 }
 
-fn powered_by_egui_and_eframe(ui: &mut egui::Ui, locale: &Locale) {
-    match locale {
-        Locale::English => {
-            #[cfg(target_arch = "wasm32")]
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-                ui.label(include_str!("locale/en/github1.txt"));
-                ui.hyperlink_to(
-                    "GitHub",
-                    "https://github.com/p6nj/graphexpr/releases/latest",
-                );
-                ui.label(include_str!("locale/en/github2.txt"));
-            });
-            ui.label(include_str!("locale/en/note.txt"));
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-                ui.label(include_str!("locale/en/libs1.txt"));
-                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                ui.label(include_str!("locale/en/libs2.txt"));
-                ui.hyperlink_to(
-                    "eframe",
-                    "https://github.com/emilk/egui/tree/master/crates/eframe",
-                );
-                ui.label(".");
-            });
-        }
-        Locale::French => {
-            #[cfg(target_arch = "wasm32")]
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-                ui.label(include_str!("locale/fr/github1.txt"));
-                ui.hyperlink_to(
-                    "GitHub",
-                    "https://github.com/p6nj/graphexpr/releases/latest",
-                );
-                ui.label(include_str!("locale/fr/github2.txt"));
-            });
-            ui.label(include_str!("locale/fr/note.txt"));
-            ui.horizontal(|ui| {
-                ui.spacing_mut().item_spacing.x = 0.0;
-                ui.label(include_str!("locale/fr/libs1.txt"));
-                ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-                ui.label(include_str!("locale/fr/libs2.txt"));
-                ui.hyperlink_to(
-                    "eframe",
-                    "https://github.com/emilk/egui/tree/master/crates/eframe",
-                );
-                ui.label(".");
-            });
-        }
-    }
+fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
+    #[cfg(target_arch = "wasm32")]
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 0.0;
+        ui.label(t!("locale/en/github1"));
+        ui.hyperlink_to(
+            "GitHub",
+            "https://github.com/p6nj/graphexpr/releases/latest",
+        );
+        ui.label(t!("locale/en/github2"));
+    });
+    ui.label(t!("note"));
+    ui.horizontal(|ui| {
+        ui.spacing_mut().item_spacing.x = 0.0;
+        ui.label(t!("libs.1"));
+        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+        ui.label(t!("libs.2"));
+        ui.hyperlink_to(
+            "eframe",
+            "https://github.com/emilk/egui/tree/master/crates/eframe",
+        );
+        ui.label(".");
+    });
 }

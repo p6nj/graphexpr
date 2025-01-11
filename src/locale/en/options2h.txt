@@ -1,1 +1,0 @@
-Width of each line. You want this proportional to the number of points so it's not filling everything but you can still see the graph.

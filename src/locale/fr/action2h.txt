@@ -1,1 +1,0 @@
-Sauvegarder seulement (évite du temps de chargement de l'image)

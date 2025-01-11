@@ -1,2 +1,0 @@
-est évaluée vraie.
-Comme l'expression retourne en fait un nombre réel, toute expression qui ne retourne pas zéro est considérée vraie. Par exemple,
